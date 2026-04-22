@@ -1,0 +1,498 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}How It Works - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    .how-it-works-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 80px);
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+    
+    .section-header h1 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+        border-radius: 2px;
+    }
+    
+    .section-header p {
+        color: #6c757d;
+        max-width: 600px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+    }
+    
+    .workflow-container {
+        position: relative;
+        padding: 2rem 0;
+    }
+    
+    .timeline-line {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #0d6efd, #0dcaf0);
+        transform: translateX(-50%);
+        z-index: 1;
+        border-radius: 2px;
+    }
+    
+    .step-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(13, 110, 253, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .step-number {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+    }
+    
+    .step-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        color: #0d6efd;
+    }
+    
+    .step-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .step-card p {
+        color: #6c757d;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.5rem 0;
+        color: #5a6268;
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .feature-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .step-left {
+        margin-right: 50%;
+        padding-right: 4rem;
+    }
+    
+    .step-right {
+        margin-left: 50%;
+        padding-left: 4rem;
+    }
+    
+    .cta-section {
+        background: white;
+        border-radius: 15px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-top: 3rem;
+        border-top: 5px solid #0d6efd;
+    }
+    
+    .cta-section h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    
+    .cta-section p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-cta-primary {
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-cta-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
+        color: white;
+    }
+    
+    .btn-cta-secondary {
+        background: white;
+        color: #0d6efd;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid #0d6efd;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-cta-secondary:hover {
+        background: #0d6efd;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .step-left, .step-right {
+            margin: 0 0 2rem 0;
+            padding: 2rem;
+        }
+        
+        .timeline-line {
+            display: none;
+        }
+        
+        .workflow-container {
+            padding: 1rem 0;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+        
+        .step-icon {
+            font-size: 2rem;
+        }
+        
+        .cta-section {
+            padding: 2rem 1rem;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-cta-primary, .btn-cta-secondary {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="how-it-works-section py-5">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="section-header">
+            <h1>How Public Pulse Works</h1>
+            <p>Our AI-powered platform makes grievance redressal simple, efficient, and transparent. Follow these easy steps to get your issues resolved.</p>
+        </div>
+        
+        <!-- Timeline Workflow -->
+        <div class="workflow-container">
+            <div class="timeline-line"></div>
+            
+            <!-- Step 1 -->
+            <div class="step-card step-left">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                        <div class="step-number">1</div>
+                        <div class="step-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h3>Create Your Account</h3>
+                        <p>Start by creating a free account with your basic information. Registration takes less than 2 minutes and gives you full access to all features.</p>
+                        <ul class="feature-list">
+                            <li>Quick email verification process</li>
+                            <li>Secure password protection</li>
+                            <li>Personal dashboard creation</li>
+                            <li>Multiple login options</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="step-card step-right">
+                <div class="row align-items-center">
+                    <div class="col-md-10 order-md-1 order-2">
+                        <h3>Lodge Your Complaint</h3>
+                        <p>Submit your grievance through our intuitive form. Provide details, select categories, and upload supporting documents or images.</p>
+                        <ul class="feature-list">
+                            <li>Easy-to-use complaint form</li>
+                            <li>Multiple category options</li>
+                            <li>File upload support (images, PDFs)</li>
+                            <li>Location tagging for local issues</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2 text-center mb-3 mb-md-0 order-md-2 order-1">
+                        <div class="step-number">2</div>
+                        <div class="step-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="step-card step-left">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                        <div class="step-number">3</div>
+                        <div class="step-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h3>AI-Powered Analysis</h3>
+                        <p>Our advanced AI system processes your complaint to ensure it reaches the right department quickly and efficiently.</p>
+                        <ul class="feature-list">
+                            <li>Automatic categorization</li>
+                            <li>Priority level detection</li>
+                            <li>Sentiment analysis for urgency</li>
+                            <li>Duplicate complaint checking</li>
+                            <li>Keyword extraction and tagging</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4 -->
+            <div class="step-card step-right">
+                <div class="row align-items-center">
+                    <div class="col-md-10 order-md-1 order-2">
+                        <h3>Smart Department Assignment</h3>
+                        <p>The system automatically routes your complaint to the most relevant government department based on AI analysis.</p>
+                        <ul class="feature-list">
+                            <li>Intelligent department matching</li>
+                            <li>Escalation rules for high-priority issues</li>
+                            <li>Multi-department routing when needed</li>
+                            <li>Real-time department availability check</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2 text-center mb-3 mb-md-0 order-md-2 order-1">
+                        <div class="step-number">4</div>
+                        <div class="step-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5 -->
+            <div class="step-card step-left">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                        <div class="step-number">5</div>
+                        <div class="step-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h3>Real-Time Tracking & Updates</h3>
+                        <p>Monitor your complaint's progress with our comprehensive tracking system. Get notified at every stage of resolution.</p>
+                        <ul class="feature-list">
+                            <li>Live status updates</li>
+                            <li>Progress percentage indicator</li>
+                            <li>Email and SMS notifications</li>
+                            <li>Estimated resolution time</li>
+                            <li>Department response tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 6 -->
+            <div class="step-card step-right">
+                <div class="row align-items-center">
+                    <div class="col-md-10 order-md-1 order-2">
+                        <h3>Resolution & Feedback</h3>
+                        <p>Once resolved, review the outcome and provide valuable feedback to help us improve our services.</p>
+                        <ul class="feature-list">
+                            <li>Resolution confirmation</li>
+                            <li>Satisfaction rating system</li>
+                            <li>Detailed feedback options</li>
+                            <li>Case closure with documentation</li>
+                            <li>Reopen option if needed</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2 text-center mb-3 mb-md-0 order-md-2 order-1">
+                        <div class="step-number">6</div>
+                        <div class="step-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action Section -->
+        <div class="cta-section">
+            <h3>Ready to Get Started?</h3>
+            <p>Join thousands of citizens who are already using Public Pulse to get their issues resolved efficiently. Create your first complaint in minutes!</p>
+            <div class="cta-buttons">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'lodge_complaint' %}" class="btn-cta-primary">
+                        <i class="fas fa-plus-circle"></i> Lodge New Complaint
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn-cta-secondary">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn-cta-primary">
+                        <i class="fas fa-user-plus"></i> Create Free Account
+                    </a>
+                    <a href="{% url 'login' %}" class="btn-cta-secondary">
+                        <i class="fas fa-sign-in-alt"></i> Login to Continue
+                    </a>
+                    <a href="{% url 'lodge_complaint' %}" class="btn-cta-secondary">
+                        <i class="fas fa-edit"></i> Lodge Complaint (Guest)
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Benefits Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-bolt fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title">Fast Processing</h5>
+                        <p class="card-text">AI analysis reduces processing time by up to 80% compared to traditional methods.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">100% Secure</h5>
+                        <p class="card-text">Your data is encrypted and protected with enterprise-level security measures.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-chart-bar fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">High Success Rate</h5>
+                        <p class="card-text">92% of complaints submitted through Public Pulse reach resolution successfully.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add animation to step cards on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const stepCards = document.querySelectorAll('.step-card');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        stepCards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+    });
+</script>
+{% endblock %}

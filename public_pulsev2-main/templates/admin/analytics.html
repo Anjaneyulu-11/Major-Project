@@ -1,0 +1,638 @@
+{% extends 'admin/admin_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid p-0">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="page-title">
+                    <h1><i class="fas fa-chart-bar me-2"></i> Analytics Dashboard</h1>
+                    <p>Comprehensive insights and performance metrics</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calendar me-2"></i>Last 30 Days
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="setTimeframe('7d')">Last 7 Days</a></li>
+                            <li><a class="dropdown-item active" href="#" onclick="setTimeframe('30d')">Last 30 Days</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimeframe('90d')">Last 90 Days</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimeframe('1y')">Last Year</a></li>
+                        </ul>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">{{ request.user.first_name|first }}{{ request.user.last_name|first }}</div>
+                        <div>
+                            <div class="fw-bold">{{ request.user.get_full_name }}</div>
+                            <div class="small text-muted">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Key Metrics -->
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <div class="card-icon complaints">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-value">{{ total_complaints_30|default:"0" }}</div>
+            <div class="card-label">Complaints (30 days)</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 15% from last period
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon resolved">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <div class="card-value">{{ resolved_complaints_30|default:"0" }}</div>
+            <div class="card-label">Resolved (30 days)</div>
+            <div class="card-label" style="margin-top: 5px;">
+                Resolution Rate: 
+                {% if total_complaints_30 > 0 %}
+                    {% widthratio resolved_complaints_30 total_complaints_30 100 %}%
+                {% else %}
+                    0%
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon users">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="card-value">{{ new_users_30|default:"0" }}</div>
+            <div class="card-label">New Users (30 days)</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 8% from last period
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon feedback">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-value">{{ avg_resolution_time|default:"24" }}</div>
+            <div class="card-label">Avg. Resolution Time (hours)</div>
+            <div class="card-change negative">
+                <i class="fas fa-arrow-down"></i> 10% from last period
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-chart-line me-2"></i> Complaint Trends</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="updateChart('daily')">Daily</button>
+                        <button class="btn btn-sm btn-outline-secondary active" onclick="updateChart('weekly')">Weekly</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="updateChart('monthly')">Monthly</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="complaintTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-chart-pie me-2"></i> Status Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="statusDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Analytics -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-chart-bar me-2"></i> Category Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-chart-line me-2"></i> User Registration Trends</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userRegistrationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Performance & Sentiment Analysis -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-building me-2"></i> Department Performance</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Complaints</th>
+                                <th>Resolved</th>
+                                <th>Resolution Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dept in department_performance %}
+                            <tr>
+                                <td>{{ dept.name }}</td>
+                                <td>{{ dept.total_complaints|default:0 }}</td>
+                                <td>{{ dept.resolved_complaints|default:0 }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 20px;">
+                                            <div class="progress-bar {% if dept.resolution_rate >= 80 %}bg-success{% elif dept.resolution_rate >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                 style="width: {{ dept.resolution_rate|default:0 }}%">
+                                            </div>
+                                        </div>
+                                        <span class="badge {% if dept.resolution_rate >= 80 %}bg-success{% elif dept.resolution_rate >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ dept.resolution_rate|default:0|floatformat:1 }}%
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">No department data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-smile me-2"></i> Sentiment Analysis</h2>
+                </div>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">Overall Sentiment Score</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-3" style="height: 25px;">
+                                        {% with score=avg_sentiment|default:0 %}
+                                        {% with normalized_score=score|add:1|div:2|mul:100 %}
+                                        <div class="progress-bar {% if score > 0.1 %}bg-success{% elif score < -0.1 %}bg-danger{% else %}bg-warning{% endif %}" 
+                                             style="width: {{ normalized_score }}%">
+                                        </div>
+                                        {% endwith %}
+                                        {% endwith %}
+                                    </div>
+                                    <span class="fw-bold {% if avg_sentiment > 0.1 %}text-success{% elif avg_sentiment < -0.1 %}text-danger{% else %}text-warning{% endif %}">
+                                        {{ avg_sentiment|default:0|floatformat:2 }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="sentimentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Categories & Recent Activity -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-list-alt me-2"></i> Top Complaint Categories</h2>
+                    <a href="{% url 'pulse_admin:manage_complaints' %}" class="view-all">View All →</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in top_categories %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="category-color me-2" style="width: 12px; height: 12px; border-radius: 50%; background-color: {{ cat.color|default:'#4e73df' }};"></div>
+                                        {{ cat.name|default:"General" }}
+                                    </div>
+                                </td>
+                                <td>{{ cat.count|default:0 }}</td>
+                                <td>
+                                    {% if total_complaints_30 > 0 %}
+                                        {% widthratio cat.count total_complaints_30 100 %}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if cat.trend == 'up' %}
+                                        <span class="text-success"><i class="fas fa-arrow-up"></i> Increasing</span>
+                                    {% elif cat.trend == 'down' %}
+                                        <span class="text-danger"><i class="fas fa-arrow-down"></i> Decreasing</span>
+                                    {% else %}
+                                        <span class="text-warning"><i class="fas fa-minus"></i> Stable</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">No category data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-bolt me-2"></i> Recent Activity</h2>
+                    <a href="{% url 'pulse_admin:interactions' %}" class="view-all">View All →</a>
+                </div>
+                <div class="activity-timeline">
+                    {% for complaint in recent_complaints %}
+                    <div class="activity-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-exclamation-circle me-2 text-{% if complaint.priority == 'high' %}danger{% elif complaint.priority == 'medium' %}warning{% else %}info{% endif %}"></i>
+                                    Complaint #{{ complaint.id }}
+                                </h6>
+                                <p class="mb-1 small">{{ complaint.user.get_full_name|default:complaint.user.username }} reported an issue</p>
+                                <p class="mb-0 small text-muted">{{ complaint.category|default:"General" }} • {{ complaint.created_at|timesince }} ago</p>
+                            </div>
+                            <span class="badge {% if complaint.status == 'resolved' %}bg-success{% elif complaint.status == 'in_progress' %}bg-info{% elif complaint.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ complaint.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activity</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Complaint Trend Chart
+    const trendCtx = document.getElementById('complaintTrendChart').getContext('2d');
+    const trendChart = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Complaints',
+                data: [12, 19, 15, 25, 22, 30],
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Resolved',
+                data: [8, 12, 9, 18, 15, 22],
+                borderColor: '#27ae60',
+                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
+            }
+        }
+    });
+
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Resolved', 'Rejected'],
+            datasets: [{
+                data: [12, 8, 25, 5],
+                backgroundColor: [
+                    '#f39c12',
+                    '#3498db',
+                    '#27ae60',
+                    '#e74c3c'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Category Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const categoryChart = new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Transport', 'Water', 'Electricity', 'Sanitation', 'Healthcare', 'Education'],
+            datasets: [{
+                label: 'Complaints by Category',
+                data: [12, 19, 8, 15, 10, 7],
+                backgroundColor: [
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(155, 89, 182, 0.7)',
+                    'rgba(241, 196, 15, 0.7)',
+                    'rgba(230, 126, 34, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderColor: [
+                    '#3498db',
+                    '#2ecc71',
+                    '#9b59b6',
+                    '#f1c40f',
+                    '#e67e22',
+                    '#e74c3c'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
+            }
+        }
+    });
+
+    // User Registration Chart
+    const userCtx = document.getElementById('userRegistrationChart').getContext('2d');
+    const userChart = new Chart(userCtx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'New Users',
+                data: [8, 12, 6, 15],
+                borderColor: '#9b59b6',
+                backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Sentiment Chart
+    const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+    const sentimentChart = new Chart(sentimentCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Sentiment Score',
+                data: [0.2, -0.1, 0.3, 0.1, -0.2, 0.4, 0.2],
+                borderColor: '#f39c12',
+                backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: -1,
+                    max: 1,
+                    ticks: {
+                        stepSize: 0.2
+                    }
+                }
+            }
+        }
+    });
+
+    // Timeframe functions
+    function setTimeframe(timeframe) {
+        // Update active state in dropdown
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Update button text
+        const button = document.querySelector('.dropdown-toggle');
+        let text = 'Last 30 Days';
+        if (timeframe === '7d') text = 'Last 7 Days';
+        if (timeframe === '90d') text = 'Last 90 Days';
+        if (timeframe === '1y') text = 'Last Year';
+        
+        button.innerHTML = `<i class="fas fa-calendar me-2"></i>${text}`;
+        
+        // Here you would typically make an AJAX call to update data
+        console.log('Setting timeframe to:', timeframe);
+        // fetch(`/api/analytics/?timeframe=${timeframe}`)
+        //     .then(response => response.json())
+        //     .then(data => updateCharts(data));
+    }
+
+    function updateChart(type) {
+        // Update button states
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Update chart based on type
+        console.log('Updating chart to:', type);
+        // Implement chart data update logic
+    }
+
+    // Export functionality
+    function exportAnalytics() {
+        // Get current timeframe
+        const timeframe = document.querySelector('.dropdown-toggle').textContent.trim();
+        
+        // Create export data
+        const exportData = {
+            timeframe: timeframe,
+            complaints_30: {{ total_complaints_30|default:0 }},
+            resolved_30: {{ resolved_complaints_30|default:0 }},
+            new_users_30: {{ new_users_30|default:0 }},
+            avg_resolution_time: {{ avg_resolution_time|default:"24" }},
+            export_date: new Date().toISOString()
+        };
+        
+        // Create and download JSON file
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = window.URL.createObjectURL(dataBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `analytics_export_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Print functionality
+    function printReport() {
+        window.print();
+    }
+</script>
+
+<!-- Custom CSS for Analytics Page -->
+<style>
+    .category-color {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .activity-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #e0e0e0;
+    }
+
+    .activity-item {
+        position: relative;
+    }
+
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 10px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #3498db;
+        border: 2px solid white;
+        box-shadow: 0 0 0 3px #3498db;
+    }
+
+    .activity-item.success::before { background-color: #27ae60; box-shadow: 0 0 0 3px #27ae60; }
+    .activity-item.warning::before { background-color: #f39c12; box-shadow: 0 0 0 3px #f39c12; }
+    .activity-item.danger::before { background-color: #e74c3c; box-shadow: 0 0 0 3px #e74c3c; }
+
+    /* Print styles */
+    @media print {
+        .sidebar, .navbar, .btn, .dropdown, .action-buttons {
+            display: none !important;
+        }
+        
+        .main-content {
+            margin-left: 0 !important;
+            padding: 20px !important;
+        }
+        
+        .dashboard-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        
+        .card-change, .view-all, .dropdown-toggle {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

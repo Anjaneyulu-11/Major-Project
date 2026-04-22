@@ -1,0 +1,622 @@
+<!-- templates/complaints/lodge_complaint.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lodge Complaint - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+.complaint-form-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+}
+.complaint-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+.ai-preview {
+    background: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    border-radius: 8px;
+}
+.priority-high { color: #dc3545; font-weight: bold; }
+.priority-medium { color: #ffc107; font-weight: bold; }
+.priority-low { color: #198754; font-weight: bold; }
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+.alert-dismissible {
+    border-radius: 10px;
+}
+.file-input-container {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+.file-input-container input[type=file] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+.file-input-label {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.file-input-label:hover {
+    background-color: #e9ecef;
+}
+.file-name-display {
+    margin-left: 10px;
+    color: #6c757d;
+    font-style: italic;
+}
+.image-preview-container {
+    display: none;
+    margin-top: 15px;
+    border: 1px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+.image-preview {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 5px;
+}
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.loading-spinner {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Display Messages -->
+{% if messages %}
+<div class="container mt-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2"></i> Success!
+            {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2"></i> Error!
+            {% else %}
+            <i class="fas fa-info-circle me-2"></i> Info!
+            {% endif %}
+        </strong>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Hero Section -->
+<div class="complaint-form-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h1 class="display-4 mb-4">Lodge a Complaint</h1>
+                <p class="lead">Submit your complaints and feedback. Our AI system will analyze and route it to the appropriate department.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 class="mt-3 text-primary">Submitting Complaint...</h4>
+        <p class="text-muted">Please wait while we process your complaint and send confirmation email.</p>
+        <div class="progress mt-3" style="height: 10px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Complaint Form -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card complaint-card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-edit me-2"></i> Complaint Form</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="complaintForm" action="{% url 'lodge_complaint' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Display Form Errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><i class="fas fa-exclamation-triangle me-2"></i>Please fix the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Personal Information -->
+                        <h5 class="mb-3 text-primary"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Your Name *</label>
+                                <input type="text" name="name" class="form-control form-control-lg" 
+                                       placeholder="Enter your full name" required
+                                       value="{% if form.name.value %}{{ form.name.value }}{% endif %}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email Address *</label>
+                                <input type="email" name="email" class="form-control form-control-lg" 
+                                       placeholder="example@email.com" required
+                                       value="{% if form.email.value %}{{ form.email.value }}{% endif %}">
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Your Complaint ID will be sent to this email address
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number (Optional)</label>
+                                <input type="tel" name="phone" class="form-control" 
+                                       placeholder="+91 9876543210"
+                                       value="{% if form.phone.value %}{{ form.phone.value }}{% endif %}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Address (Optional)</label>
+                                <input type="text" name="address" class="form-control" 
+                                       placeholder="Enter your address"
+                                       value="{% if form.address.value %}{{ form.address.value }}{% endif %}">
+                            </div>
+                        </div>
+                        
+                        <!-- Complaint Details -->
+                        <h5 class="mb-3 text-primary"><i class="fas fa-exclamation-circle me-2"></i>Complaint Details</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Complaint Category *</label>
+                                <select name="category" class="form-select" required id="categorySelect">
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Municipal Issues" {% if form.category.value == 'Municipal Issues' %}selected{% endif %}>Municipal Issues</option>
+                                    <option value="Electricity" {% if form.category.value == 'Electricity' %}selected{% endif %}>Electricity</option>
+                                    <option value="Water Supply" {% if form.category.value == 'Water Supply' %}selected{% endif %}>Water Supply</option>
+                                    <option value="Healthcare" {% if form.category.value == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+                                    <option value="Education" {% if form.category.value == 'Education' %}selected{% endif %}>Education</option>
+                                    <option value="Transport" {% if form.category.value == 'Transport' %}selected{% endif %}>Transport</option>
+                                    <option value="Corruption" {% if form.category.value == 'Corruption' %}selected{% endif %}>Corruption & Bribery</option>
+                                    <option value="Public Safety" {% if form.category.value == 'Public Safety' %}selected{% endif %}>Public Safety</option>
+                                    <option value="General" {% if form.category.value == 'General' %}selected{% endif %}>General Complaint</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Sub-Category (Optional)</label>
+                                <input type="text" name="sub_category" class="form-control" 
+                                       placeholder="e.g., Road Repair, Power Outage"
+                                       value="{% if form.sub_category.value %}{{ form.sub_category.value }}{% endif %}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Complaint Details *</label>
+                            <textarea name="details" class="form-control" rows="6" 
+                                      id="complaintDetails"
+                                      placeholder="Please describe your issue in detail. Include:
+• Location of the problem
+• Date and time it occurred
+• Specific details about what happened
+• Any previous attempts to resolve
+• What resolution you expect" 
+                                      required>{% if form.details.value %}{{ form.details.value }}{% endif %}</textarea>
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                Be specific and provide all relevant details for faster resolution.
+                            </div>
+                        </div>
+                        
+                        <!-- Location Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3 text-primary"><i class="fas fa-map-marker-alt me-2"></i>Location Details</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City/District *</label>
+                                    <input type="text" name="city" class="form-control" 
+                                           placeholder="Enter your city or district" required
+                                           value="{% if form.city.value %}{{ form.city.value }}{% endif %}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">PIN Code (Optional)</label>
+                                    <input type="text" name="pincode" class="form-control" 
+                                           placeholder="6-digit PIN code"
+                                           value="{% if form.pincode.value %}{{ form.pincode.value }}{% endif %}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Image Field -->
+                        <div class="mb-4">
+                            <label class="form-label">Upload Image (Optional)</label>
+                            <div class="input-group">
+                                <div class="file-input-container">
+                                    <label for="imageUpload" class="file-input-label">
+                                        <i class="fas fa-cloud-upload-alt me-2"></i>Choose File
+                                    </label>
+                                    <input type="file" name="image" class="form-control" id="imageUpload" accept="image/*">
+                                </div>
+                                <span class="file-name-display" id="fileNameDisplay">No file chosen</span>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Upload a photo of the problem (Max size: 5MB, Formats: JPG, PNG, GIF)
+                            </div>
+                            
+                            <!-- Image Preview Container -->
+                            <div class="image-preview-container" id="imagePreviewContainer">
+                                <h6 class="text-muted mb-2">Image Preview:</h6>
+                                <img src="" alt="Preview" class="image-preview" id="imagePreview">
+                            </div>
+                        </div>
+                        
+                        <!-- AI Analysis Preview -->
+                        <div class="mb-4 ai-preview p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-robot me-2"></i>AI Analysis Preview
+                                <small class="text-muted ms-2">(Updates as you type)</small>
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-3 text-center mb-3">
+                                    <small class="text-muted d-block">Detected Category</small>
+                                    <div id="ai-category" class="fw-bold fs-5 text-info">-</div>
+                                </div>
+                                <div class="col-md-3 text-center mb-3">
+                                    <small class="text-muted d-block">Priority Level</small>
+                                    <div id="ai-priority" class="fw-bold fs-5">-</div>
+                                </div>
+                                <div class="col-md-3 text-center mb-3">
+                                    <small class="text-muted d-block">Sentiment</small>
+                                    <div id="ai-sentiment" class="fw-bold fs-5">-</div>
+                                </div>
+                                <div class="col-md-3 text-center mb-3">
+                                    <small class="text-muted d-block">AI Confidence</small>
+                                    <div id="ai-confidence" class="fw-bold fs-5">-</div>
+                                </div>
+                            </div>
+                            <div id="ai-insight" class="mt-2 text-muted small">
+                                Start typing your complaint to see AI analysis...
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i> Submit Complaint
+                            </button>
+                            <p class="text-muted mt-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>You will receive a unique Complaint ID via email</strong> for tracking after submission.
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="row mt-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-robot feature-icon text-primary"></i>
+                            <h5>AI Categorization</h5>
+                            <p class="text-muted">Automatic categorization using advanced AI algorithms</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-bolt feature-icon text-warning"></i>
+                            <h5>Priority Detection</h5>
+                            <p class="text-muted">AI detects urgency level for faster resolution</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-envelope feature-icon text-success"></i>
+                            <h5>Email Confirmation</h5>
+                            <p class="text-muted">Instant email with your unique Complaint ID for tracking</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    let typingTimer;
+    const doneTypingInterval = 1000; // 1 second
+    
+    // Real-time AI Analysis
+    $('#complaintDetails').on('input', function() {
+        clearTimeout(typingTimer);
+        
+        const text = $(this).val();
+        if (text.length > 20) {
+            // Show loading state
+            $('#ai-category').html('<span class="text-warning">Analyzing...</span>');
+            $('#ai-priority').text('...');
+            $('#ai-sentiment').text('...');
+            $('#ai-confidence').text('...');
+            $('#ai-insight').html('<span class="text-warning">AI is analyzing your complaint...</span>');
+            
+            typingTimer = setTimeout(function() {
+                // Simulate API call (Replace with actual AJAX)
+                simulateAIAnalysis(text);
+            }, doneTypingInterval);
+        }
+    });
+    
+    // Category selection effect
+    $('#categorySelect').change(function() {
+        const category = $(this).val();
+        if (category) {
+            $('#ai-category').removeClass('text-info text-warning').addClass('text-success').text(category);
+            $('#ai-confidence').text('100%');
+            $('#ai-insight').text('Manual category selected. AI will respect your choice.');
+        }
+    });
+    
+    function simulateAIAnalysis(text) {
+        // This simulates AI analysis - Replace with actual API call
+        const lowerText = text.toLowerCase();
+        
+        // Detect category based on keywords
+        let detectedCategory = 'General';
+        let priority = 'Medium';
+        let sentiment = 'Neutral';
+        let confidence = '85%';
+        let insight = '';
+        
+        // Category detection
+        if (lowerText.includes('road') || lowerText.includes('pothole') || lowerText.includes('garbage') || lowerText.includes('drain') || lowerText.includes('street')) {
+            detectedCategory = 'Municipal Issues';
+            priority = 'High';
+            sentiment = 'Negative';
+            insight = 'Municipal issue detected. High priority due to public safety concern.';
+        } else if (lowerText.includes('water') || lowerText.includes('supply') || lowerText.includes('pipeline') || lowerText.includes('leak') || lowerText.includes('drainage')) {
+            detectedCategory = 'Water Supply';
+            priority = 'High';
+            sentiment = 'Negative';
+            insight = 'Water supply issue. High priority for basic needs.';
+        } else if (lowerText.includes('power') || lowerText.includes('electricity') || lowerText.includes('current') || lowerText.includes('blackout') || lowerText.includes('voltage')) {
+            detectedCategory = 'Electricity';
+            priority = 'High';
+            sentiment = 'Negative';
+            insight = 'Electricity issue detected. High priority for daily life.';
+        } else if (lowerText.includes('hospital') || lowerText.includes('doctor') || lowerText.includes('health') || lowerText.includes('medical') || lowerText.includes('treatment')) {
+            detectedCategory = 'Healthcare';
+            priority = 'High';
+            sentiment = 'Concerned';
+            insight = 'Healthcare related complaint. Requires urgent attention.';
+        } else if (lowerText.includes('bribe') || lowerText.includes('corruption') || lowerText.includes('fraud') || lowerText.includes('illegal') || lowerText.includes('scam')) {
+            detectedCategory = 'Corruption';
+            priority = 'High';
+            sentiment = 'Very Negative';
+            insight = 'Corruption complaint detected. Will be escalated to appropriate authorities.';
+        }
+        
+        // Priority adjustment based on urgency words
+        if (lowerText.includes('emergency') || lowerText.includes('urgent') || lowerText.includes('immediate') || lowerText.includes('critical')) {
+            priority = 'High';
+            insight = 'Urgency detected! This complaint will be prioritized.';
+        } else if (lowerText.includes('serious') || lowerText.includes('dangerous') || lowerText.includes('risk')) {
+            priority = 'High';
+        } else if (lowerText.includes('minor') || lowerText.includes('small') || lowerText.includes('not urgent')) {
+            priority = 'Low';
+        }
+        
+        // Sentiment detection
+        if (lowerText.includes('angry') || lowerText.includes('frustrated') || lowerText.includes('disappointed') || lowerText.includes('helpless')) {
+            sentiment = 'Very Negative';
+            insight = 'Citizen expresses strong negative emotions. Requires careful handling.';
+        } else if (lowerText.includes('happy') || lowerText.includes('satisfied') || lowerText.includes('thank') || lowerText.includes('appreciate')) {
+            sentiment = 'Positive';
+            insight = 'Positive feedback detected. Great for service improvement.';
+        } else if (lowerText.includes('sad') || lowerText.includes('worried') || lowerText.includes('concerned') || lowerText.includes('anxious')) {
+            sentiment = 'Negative';
+        }
+        
+        // Confidence calculation based on text length and keywords
+        if (text.length > 100) {
+            confidence = '92%';
+        } else if (text.length > 50) {
+            confidence = '85%';
+        } else {
+            confidence = '75%';
+        }
+        
+        // Update UI
+        $('#ai-category').removeClass('text-warning').addClass('text-info').text(detectedCategory);
+        
+        // Priority with color coding
+        $('#ai-priority').removeClass('priority-high priority-medium priority-low').addClass('fw-bold fs-5');
+        if (priority === 'High') {
+            $('#ai-priority').addClass('priority-high').text(priority);
+        } else if (priority === 'Medium') {
+            $('#ai-priority').addClass('priority-medium').text(priority);
+        } else {
+            $('#ai-priority').addClass('priority-low').text(priority);
+        }
+        
+        $('#ai-sentiment').text(sentiment);
+        $('#ai-confidence').text(confidence);
+        $('#ai-insight').text(insight || 'AI analyzed your complaint for better routing.');
+    }
+    
+    // Image Upload Preview Functionality
+    $('#imageUpload').change(function() {
+        const fileInput = $(this);
+        const fileNameDisplay = $('#fileNameDisplay');
+        const imagePreviewContainer = $('#imagePreviewContainer');
+        const imagePreview = $('#imagePreview');
+        
+        if (fileInput[0].files.length > 0) {
+            const file = fileInput[0].files[0];
+            const fileName = file.name;
+            
+            // Display file name
+            fileNameDisplay.text(fileName);
+            
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                fileInput.val('');
+                fileNameDisplay.text('No file chosen');
+                imagePreviewContainer.hide();
+                return;
+            }
+            
+            // Validate file type
+            const validExtensions = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validExtensions.includes(file.type)) {
+                alert('Please upload only JPG, PNG, or GIF images.');
+                fileInput.val('');
+                fileNameDisplay.text('No file chosen');
+                imagePreviewContainer.hide();
+                return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.attr('src', e.target.result);
+                imagePreviewContainer.show();
+            }
+            reader.readAsDataURL(file);
+        } else {
+            fileNameDisplay.text('No file chosen');
+            imagePreviewContainer.hide();
+        }
+    });
+    
+    // Form submission handler
+    $('#complaintForm').submit(function(e) {
+        const submitBtn = $('#submitBtn');
+        const loadingOverlay = $('#loadingOverlay');
+        const originalText = submitBtn.html();
+        
+        // Basic validation
+        const name = $('input[name="name"]').val();
+        const email = $('input[name="email"]').val();
+        const category = $('select[name="category"]').val();
+        const details = $('textarea[name="details"]').val();
+        
+        if (!name || !email || !category || !details) {
+            e.preventDefault();
+            alert('Please fill all required fields (marked with *)');
+            return false;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            e.preventDefault();
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        
+        // Validate image file size if selected
+        const fileInput = $('#imageUpload')[0];
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            
+            if (file.size > maxSize) {
+                e.preventDefault();
+                alert('Image file size exceeds 5MB limit. Please choose a smaller file.');
+                return false;
+            }
+        }
+        
+        // Show loading overlay
+        loadingOverlay.show();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Processing...');
+        
+        // Show message about email
+        setTimeout(function() {
+            loadingOverlay.find('h4').text('Sending Confirmation Email...');
+            loadingOverlay.find('p').text('Please wait while we send your Complaint ID to ' + email);
+        }, 2000);
+        
+        // Continue with form submission
+        return true;
+    });
+    
+    // Auto-trigger analysis if there's existing text
+    const existingText = $('#complaintDetails').val();
+    if (existingText && existingText.length > 20) {
+        simulateAIAnalysis(existingText);
+    }
+    
+    // Handle browser back button - clear form if coming from success page
+    if (performance.navigation.type === 2) {
+        // Page was accessed via back button
+        $('#complaintForm')[0].reset();
+        $('#fileNameDisplay').text('No file chosen');
+        $('#imagePreviewContainer').hide();
+        $('#ai-category').text('-');
+        $('#ai-priority').text('-');
+        $('#ai-sentiment').text('-');
+        $('#ai-confidence').text('-');
+        $('#ai-insight').text('Start typing your complaint to see AI analysis...');
+    }
+});
+</script>
+{% endblock %}

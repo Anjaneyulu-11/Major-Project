@@ -1,0 +1,271 @@
+﻿{% extends 'pulse_admin/base.html' %}
+
+{% block title %}Manage Complaints{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Manage Complaints</h1>
+        <a href="{% url 'pulse_admin:export_complaints' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-download"></i> Export
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3">
+                    <label>Status</label>
+                    <select name="status" class="form-control">
+                        <option value="">All</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Category</label>
+                    <select name="category" class="form-control">
+                        <option value="">All</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Priority</label>
+                    <select name="priority" class="form-control">
+                        <option value="">All</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="ID, Name, Email">
+                </div>
+                <div class="col-md-12 mt-3">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{% url 'pulse_admin:manage_complaints' %}" class="btn btn-secondary">Clear All</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Complaints</h5>
+                    <h2>{{ total_complaints|default:"0" }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Pending</h5>
+                    <h2>{{ pending_count|default:"0" }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Resolved</h5>
+                    <h2>{{ resolved_count|default:"0" }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>High Priority</h5>
+                    <h2>{{ high_priority_count|default:"0" }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaints Table -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">All Complaints</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Complaint ID</th>
+                            <th>Citizen</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Submitted</th>
+                            <th>Assigned To</th>
+                            <th>Actions</th>
+                        </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                        <tr class="{% if complaint.ai_priority == 'High' %}table-danger{% endif %}">
+                            <td class="fw-bold">{{ complaint.complaint_id|default:complaint.id }}</td>
+                            <td>
+                                {{ complaint.name|default:"Anonymous" }}
+                                <br>
+                                <small class="text-muted">{{ complaint.email|default:"No email" }}</small>
+                            </td>
+                            <td>{{ complaint.category|default:"General" }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if complaint.status == 'Resolved' %}bg-success
+                                    {% elif complaint.status == 'In Progress' %}bg-info
+                                    {% elif complaint.status == 'Submitted' %}bg-secondary
+                                    {% else %}bg-dark{% endif %}">
+                                    {{ complaint.status|default:"Submitted" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if complaint.ai_priority == 'High' %}bg-danger
+                                    {% elif complaint.ai_priority == 'Medium' %}bg-warning
+                                    {% else %}bg-success{% endif %}">
+                                    {{ complaint.ai_priority|default:"Medium" }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ complaint.created_at|date:"M d, Y" }}
+                                <br>
+                                <small class="text-muted">{{ complaint.created_at|date:"h:i A" }}</small>
+                                <br>
+                                <small class="text-muted">{{ complaint.city|default:"" }}</small>
+                            </td>
+                            <td>
+                                {% if complaint.assigned_to %}
+                                <span class="badge bg-info">{{ complaint.assigned_to }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- View Button -->
+                                    <a href="{% url 'pulse_admin:complaint_detail' complaint.complaint_id %}" 
+                                       class="btn btn-primary" title="View Details">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    
+                                    <!-- Assign Button -->
+                                    <button type="button" class="btn btn-warning assign-btn" 
+                                            data-complaint-id="{{ complaint.complaint_id }}"
+                                            data-complaint-name="{{ complaint.name }}"
+                                            title="Assign to Department">
+                                        <i class="fas fa-user-tag"></i> Assign
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-3"></i>
+                                <p class="mb-0">No complaints found. Try adjusting your filters.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Complaint to Department</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="assignComplaintId">
+                    <div class="mb-3">
+                        <label class="form-label">Complaint ID</label>
+                        <input type="text" id="assignComplaintIdDisplay" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign To Department/Person</label>
+                        <input type="text" id="assignedTo" class="form-control" placeholder="Enter department name" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitAssignment()">Assign Complaint</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize modal and buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Assign button handlers
+    document.querySelectorAll('.assign-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const complaintId = this.getAttribute('data-complaint-id');
+            const complaintName = this.getAttribute('data-complaint-name');
+            document.getElementById('assignComplaintId').value = complaintId;
+            document.getElementById('assignComplaintIdDisplay').value = complaintId;
+            const modal = new bootstrap.Modal(document.getElementById('assignModal'));
+            modal.show();
+        });
+    });
+});
+
+// Submit assignment
+function submitAssignment() {
+    const complaintId = document.getElementById('assignComplaintId').value;
+    const assignedTo = document.getElementById('assignedTo').value;
+    
+    if (!assignedTo.trim()) {
+        alert('Please enter department name');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('complaint_id', complaintId);
+    formData.append('assigned_to', assignedTo);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    fetch('{% url "pulse_admin:bulk_update_complaints" %}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Complaint assigned successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Network error occurred');
+    });
+}
+</script>
+{% endblock %}

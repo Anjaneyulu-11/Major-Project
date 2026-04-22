@@ -1,0 +1,197 @@
+﻿{% extends 'pulse_admin/base.html' %}
+
+{% block title %}Complaint Details{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Complaint Details</h1>
+        <a href="{% url 'pulse_admin:manage_complaints' %}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to Complaints
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Complaint Information -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Complaint Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Complaint ID:</strong> {{ complaint.complaint_id }}</p>
+                            <p><strong>Name:</strong> {{ complaint.name|default:"Not provided" }}</p>
+                            <p><strong>Email:</strong> {{ complaint.email|default:"Not provided" }}</p>
+                            <p><strong>Phone:</strong> {{ complaint.phone|default:"Not provided" }}</p>
+                            <p><strong>Category:</strong> {{ complaint.category|default:"General" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> 
+                                <span class="badge 
+                                    {% if complaint.status == 'Resolved' %}bg-success
+                                    {% elif complaint.status == 'In Progress' %}bg-info
+                                    {% elif complaint.status == 'Submitted' %}bg-secondary
+                                    {% else %}bg-dark{% endif %}">
+                                    {{ complaint.status|default:"Submitted" }}
+                                </span>
+                            </p>
+                            <p><strong>Priority:</strong> 
+                                <span class="badge 
+                                    {% if complaint.ai_priority == 'High' %}bg-danger
+                                    {% elif complaint.ai_priority == 'Medium' %}bg-warning
+                                    {% else %}bg-success{% endif %}">
+                                    {{ complaint.ai_priority|default:"Medium" }}
+                                </span>
+                            </p>
+                            <p><strong>Submitted:</strong> {{ complaint.created_at|date:"M d, Y H:i" }}</p>
+                            <p><strong>Last Updated:</strong> {{ complaint.updated_at|date:"M d, Y H:i" }}</p>
+                            <p><strong>Location:</strong> {{ complaint.city|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <p><strong>Description:</strong></p>
+                            <p class="border p-3 bg-light rounded">{{ complaint.details|default:"No description provided" }}</p>
+                        </div>
+                    </div>
+                    {% if complaint.resolution_details %}
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <p><strong>Resolution Details:</strong></p>
+                            <p class="border p-3 bg-success bg-opacity-10 rounded">{{ complaint.resolution_details }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Sidebar -->
+        <div class="col-lg-4">
+            <!-- Update Status Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Update Status</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Change Status</label>
+                            <select name="status" class="form-control">
+                                <option value="Submitted" {% if complaint.status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                                <option value="In Progress" {% if complaint.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                <option value="Closed" {% if complaint.status == 'Closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Assign Complaint Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Assign Complaint</h6>
+                </div>
+                <div class="card-body">
+                    <form id="assignForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Assigned To</label>
+                            <div class="input-group">
+                                <input type="text" id="assignedTo" class="form-control" placeholder="Department name" value="{{ complaint.assigned_to|default:'' }}">
+                                <button type="button" class="btn btn-warning" onclick="assignComplaint()">
+                                    <i class="fas fa-user-tag"></i> Assign
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <a href="mailto:{{ complaint.email }}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-envelope"></i> Email Citizen
+                    </a>
+                    {% if complaint.status != 'Resolved' %}
+                    <button onclick="resolveComplaint()" class="btn btn-success w-100">
+                        <i class="fas fa-check"></i> Mark as Resolved
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function assignComplaint() {
+    const assignedTo = document.getElementById('assignedTo').value;
+    if (!assignedTo.trim()) {
+        alert('Please enter department name');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('complaint_id', '{{ complaint.complaint_id }}');
+    formData.append('assigned_to', assignedTo);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    fetch('{% url "pulse_admin:bulk_update_complaints" %}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Complaint assigned successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Network error occurred');
+    });
+}
+
+function resolveComplaint() {
+    if (confirm('Mark this complaint as resolved?')) {
+        const formData = new FormData();
+        formData.append('complaint_id', '{{ complaint.complaint_id }}');
+        formData.append('status', 'Resolved');
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch('{% url "pulse_admin:update_complaint_status_ajax" %}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Complaint resolved!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Network error occurred');
+        });
+    }
+}
+</script>
+{% endblock %}

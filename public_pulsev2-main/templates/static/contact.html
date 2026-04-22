@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    .contact-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 80px);
+        padding: 3rem 0;
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .section-header h1 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+        border-radius: 2px;
+    }
+    
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .contact-info {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .contact-form {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .contact-method {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .contact-method:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .contact-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .contact-details h4 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .contact-details p {
+        color: #6c757d;
+        margin: 0;
+        line-height: 1.6;
+    }
+    
+    .contact-details a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    
+    .contact-details a:hover {
+        text-decoration: underline;
+    }
+    
+    .department-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    
+    .department-card:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .department-card h5 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .department-card p {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control, textarea.form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, textarea.form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .social-link {
+        width: 50px;
+        height: 50px;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .social-link:hover {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 992px) {
+        .contact-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .contact-section {
+            padding: 2rem 1rem;
+        }
+        
+        .contact-info, .contact-form {
+            padding: 1.5rem;
+            margin: 0 1rem;
+        }
+        
+        .contact-method {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .contact-icon {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>Contact Us</h1>
+            <p class="lead">Get in touch with our team. We're here to help you with any questions or concerns.</p>
+        </div>
+        
+        <div class="contact-container">
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h3 class="mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Contact Information
+                </h3>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Our Office</h4>
+                        <p>
+                            Public Pulse Headquarters<br>
+                            14052 Lanet, Nakuru<br>
+                            Kenya
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Email Address</h4>
+                        <p>
+                            <strong>General Inquiries:</strong><br>
+                            <a href="mailto:info@publicpulse.com">info@publicpulse.com</a><br><br>
+                            <strong>Technical Support:</strong><br>
+                            <a href="mailto:support@publicpulse.com">support@publicpulse.com</a><br><br>
+                            <strong>Complaint Assistance:</strong><br>
+                            <a href="mailto:complaints@publicpulse.com">complaints@publicpulse.com</a>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Phone Numbers</h4>
+                        <p>
+                            <strong>Customer Service:</strong><br>
+                            <a href="tel:+254112516719">+254 112 516 719</a><br><br>
+                            <strong>Technical Support:</strong><br>
+                            <a href="tel:+254112516720">+254 112 516 720</a><br><br>
+                            <strong>Emergency (24/7):</strong><br>
+                            <a href="tel:+254112516721">+254 112 516 721</a>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Business Hours</h4>
+                        <p>
+                            <strong>Monday - Friday:</strong> 8:00 AM - 6:00 PM<br>
+                            <strong>Saturday:</strong> 9:00 AM - 1:00 PM<br>
+                            <strong>Sunday:</strong> Closed<br>
+                            <strong>Emergency Support:</strong> 24/7 via AI Chatbot
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h3 class="mb-4">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    Send Us a Message
+                </h3>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Your Name *</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Your Email *</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Subject *</label>
+                        <select name="subject" class="form-select" required>
+                            <option value="">Select a subject</option>
+                            <option value="General Inquiry">General Inquiry</option>
+                            <option value="Technical Support">Technical Support</option>
+                            <option value="Complaint Assistance">Complaint Assistance</option>
+                            <option value="Feedback">Feedback</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Department (Optional)</label>
+                        <select name="department" class="form-select">
+                            <option value="">Select department</option>
+                            {% for department in departments %}
+                            <option value="{{ department.name }}">{{ department.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Your Message *</label>
+                        <textarea name="message" class="form-control" placeholder="Please describe your inquiry in detail..." required></textarea>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter">
+                        <label class="form-check-label" for="newsletter">
+                            Subscribe to our newsletter for updates
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Send Message
+                    </button>
+                </form>
+                
+                <!-- Departments Information -->
+                <div class="mt-5">
+                    <h5 class="mb-3">
+                        <i class="fas fa-building me-2"></i>
+                        Relevant Departments
+                    </h5>
+                    {% if departments %}
+                        {% for department in departments|slice:":3" %}
+                        <div class="department-card">
+                            <h5>{{ department.name }}</h5>
+                            <p>{{ department.description|truncatewords:20 }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="department-card">
+                            <h5>Customer Service</h5>
+                            <p>Handles general inquiries and user support</p>
+                        </div>
+                        <div class="department-card">
+                            <h5>Technical Support</h5>
+                            <p>Assists with technical issues and platform questions</p>
+                        </div>
+                        <div class="department-card">
+                            <h5>Complaints Department</h5>
+                            <p>Manages complaint processing and resolution</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Information -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-headset fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">24/7 AI Support</h5>
+                        <p class="card-text">Our AI chatbot is available round the clock to answer your questions and guide you through the process.</p>
+                        <a href="{% url 'chatbot' %}" class="btn btn-outline-primary">Chat Now</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-file-alt fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Comprehensive FAQ</h5>
+                        <p class="card-text">Find answers to common questions about using our platform and the complaint process.</p>
+                        <a href="{% url 'faq' %}" class="btn btn-outline-success">Browse FAQ</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-book fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Detailed Guides</h5>
+                        <p class="card-text">Learn how to effectively use our platform with step-by-step tutorials and guides.</p>
+                        <a href="{% url 'how_it_works' %}" class="btn btn-outline-info">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

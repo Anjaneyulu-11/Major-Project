@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Public Pulse</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0; /* Increased padding */
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.6rem; /* Increased from 1.4rem */
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px; /* Slightly increased */
+            font-size: 1.8rem; /* Increased icon size */
+        }
+        
+        /* Simple Sidebar Styling */
+        .simple-sidebar {
+            background: white;
+            min-height: calc(100vh - 70px); /* Adjusted for larger navbar */
+            width: 240px; /* Slightly wider */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            position: fixed;
+            left: 0;
+            top: 70px; /* Adjusted for larger navbar */
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px; /* Increased padding */
+            text-align: center;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .sidebar-header h3 {
+            color: #1e3c72;
+            font-weight: bold;
+            font-size: 22px; /* Increased from 18px */
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-header p {
+            color: #666;
+            font-size: 14px; /* Increased from 12px */
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0; /* Increased padding */
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 3px; /* Slightly increased */
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 14px 25px; /* Increased padding */
+            color: #333;
+            text-decoration: none;
+            font-size: 16px; /* Increased from 14px */
+            transition: all 0.3s;
+            border-left: 4px solid transparent; /* Slightly thicker */
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f8f9fa;
+            color: #1e3c72;
+            border-left-color: #1e3c72;
+        }
+        
+        .sidebar-menu a.active {
+            background: #f0f5ff;
+            color: #1e3c72;
+            border-left-color: #1e3c72;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu a i {
+            width: 25px; /* Increased from 20px */
+            margin-right: 12px; /* Increased from 8px */
+            text-align: center;
+            font-size: 16px; /* Increased from 14px */
+        }
+        
+        .logout-item {
+            margin-top: 20px; /* Increased */
+            border-top: 1px solid #eaeaea;
+            padding-top: 15px; /* Increased */
+        }
+        
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-left: 240px; /* Adjusted for wider sidebar */
+            padding: 25px 30px; /* Increased padding */
+            min-height: calc(100vh - 70px);
+            width: calc(100% - 240px); /* Adjusted for wider sidebar */
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 30px; /* Increased padding */
+            margin-bottom: 25px; /* Increased margin */
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #1e3c72; /* Slightly thicker */
+        }
+        
+        .welcome-section h1 {
+            color: #1e3c72;
+            font-size: 28px; /* Increased from 22px */
+            margin-bottom: 10px; /* Increased */
+            font-weight: 600;
+        }
+        
+        .welcome-section p {
+            color: #666;
+            font-size: 17px; /* Increased from 14px */
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+        
+        /* Statistics Section */
+        .stats-section {
+            margin-bottom: 20px;
+        }
+        
+        .stats-title {
+            color: #1e3c72;
+            margin-bottom: 20px; /* Increased */
+            font-size: 22px; /* Increased from 18px */
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px; /* Slightly larger */
+            padding: 20px; /* Increased from 15px */
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-icon {
+            width: 50px; /* Increased from 40px */
+            height: 50px; /* Increased from 40px */
+            border-radius: 10px; /* Slightly larger */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px; /* Increased margin */
+            font-size: 20px; /* Increased from 16px */
+        }
+        
+        .stat-number {
+            font-size: 32px; /* Increased from 24px */
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 5px; /* Increased */
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 15px; /* Increased from 12px */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Quick Actions Section */
+        .quick-actions-section {
+            margin-bottom: 30px; /* Increased */
+        }
+        
+        .quick-actions-title {
+            color: #1e3c72;
+            margin-bottom: 20px; /* Increased */
+            font-size: 22px; /* Increased from 18px */
+            font-weight: 600;
+        }
+        
+        /* Action cards */
+        .action-card {
+            background: white;
+            border-radius: 12px; /* Slightly larger */
+            padding: 30px; /* Increased from 25px */
+            height: 100%;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-top: 5px solid #1e3c72; /* Slightly thicker */
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* Circular icon */
+        .action-icon {
+            width: 70px; /* Increased from 60px */
+            height: 70px; /* Increased from 60px */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px; /* Increased margin */
+            color: white;
+            font-size: 28px; /* Increased from 24px */
+        }
+        
+        .action-card h4 {
+            color: #1e3c72;
+            margin-bottom: 15px; /* Increased */
+            font-weight: 600;
+            font-size: 20px; /* Increased from 18px */
+        }
+        
+        .action-card p {
+            color: #666;
+            font-size: 16px; /* Increased from 14px */
+            line-height: 1.6;
+            margin-bottom: 25px; /* Increased */
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px; /* Increased padding */
+            border-radius: 6px; /* Slightly larger */
+            font-size: 16px; /* Increased from 14px */
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(30, 60, 114, 0.3);
+        }
+        
+        /* "View All Your Complaints" Section */
+        .view-all-section {
+            background: white;
+            border-radius: 12px; /* Slightly larger */
+            padding: 30px; /* Increased from 25px */
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-top: 5px solid #1e3c72; /* Slightly thicker */
+            text-align: center;
+        }
+        
+        .view-all-section h4 {
+            color: #1e3c72;
+            margin-bottom: 15px; /* Increased */
+            font-weight: 600;
+            font-size: 20px; /* Increased from 18px */
+        }
+        
+        .view-all-section p {
+            color: #666;
+            font-size: 16px; /* Increased from 14px */
+            line-height: 1.6;
+            margin-bottom: 25px; /* Increased */
+        }
+        
+        .view-all-btn {
+            background: white;
+            color: #1e3c72;
+            border: 2px solid #1e3c72;
+            padding: 12px 25px; /* Increased padding */
+            border-radius: 6px; /* Slightly larger */
+            font-size: 16px; /* Increased from 14px */
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .view-all-btn:hover {
+            background: #1e3c72;
+            color: white;
+        }
+        
+        /* Profile in Navbar */
+        .user-dropdown {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .user-dropdown:hover {
+            color: #f0f0f0;
+        }
+        
+        .user-avatar-small {
+            width: 40px; /* Increased from 30px */
+            height: 40px; /* Increased from 30px */
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px; /* Increased */
+            font-size: 18px; /* Increased from 14px */
+        }
+        
+        .user-dropdown span {
+            font-size: 16px; /* Increased from 14px */
+        }
+        
+        /* Compact grid spacing */
+        .row.g-4 {
+            --bs-gutter-y: 1rem; /* Slightly increased */
+            --bs-gutter-x: 1rem; /* Slightly increased */
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .simple-sidebar {
+                width: 220px;
+            }
+            
+            .main-content {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+                padding: 20px 25px;
+            }
+            
+            /* Slightly reduce font sizes on tablet */
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+            
+            .stats-title, .quick-actions-title {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .simple-sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-bullhorn"></i>CIVIC PULSE
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar-small me-2">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span>{{ user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 200px;">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'my_complaints' %}">
+                            <i class="fas fa-list me-2"></i>My Complaints
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </li>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="simple-sidebar">
+        <div class="sidebar-header">
+            <h3>CIVIC PULSE</h3>
+            <p>Smart Civic Engagement</p>
+            <p class="mt-2"><small>Welcome, {{ user.username }}</small></p>
+        </div>
+        
+        <div class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="{% url 'citizen_dashboard' %}" class="active">
+                        <i class="fas fa-home"></i>Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'lodge_complaint' %}">
+                        <i class="fas fa-plus-circle"></i>Lodge a Complaint
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'track_complaint' %}">
+                        <i class="fas fa-search"></i>Track Complaint
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'my_complaints' %}">
+                        <i class="fas fa-list-alt"></i>My Complaints
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-bell"></i>Notifications
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'how_it_works' %}">
+                        <i class="fas fa-info-circle"></i>How It Works
+                    </a>
+                </li>
+                <li class="logout-item">
+                    <a href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1><i class="fas fa-user-circle me-2"></i>Welcome back, {{ user.get_full_name|default:user.username|upper }}!</h1>
+            <p>Track your complaint submissions and stay updated on community issues.</p>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h3 class="stats-title"><i class="fas fa-chart-bar me-2"></i>Your Complaint Statistics</h3>
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(30, 60, 114, 0.1); color: #1e3c72;">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="stat-number">{{ total_complaints|default:"0" }}</div>
+                        <div class="stat-label">Total Complaints</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number">{{ resolved_complaints|default:"0" }}</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number">{{ pending_complaints|default:"0" }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(23, 162, 184, 0.1); color: #17a2b8;">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-number">{{ in_progress_complaints|default:"0" }}</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="quick-actions-section">
+            <h3 class="quick-actions-title">Quick Actions</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h4>Lodge Complaint</h4>
+                        <p>Submit a new complaint with details, location, and images.</p>
+                        <a href="{% url 'lodge_complaint' %}" class="action-btn">
+                            Submit Complaint
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4>Track Complaint</h4>
+                        <p>Check the status of your submitted complaints using Complaint ID.</p>
+                        <a href="{% url 'track_complaint' %}" class="action-btn">
+                            Track Now
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h4>AI Assistant</h4>
+                        <p>Get help with your complaints, check status updates and get recommendations.</p>
+                        <a href="{% url 'chatbot' %}" class="action-btn">
+                            Chat Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View All Your Complaints Section -->
+        <div class="view-all-section">
+            <h4>View All Your Complaints</h4>
+            <p>See all your submitted complaints and their current status.</p>
+            <a href="{% url 'my_complaints' %}" class="view-all-btn">
+                View All Complaints
+            </a>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight active sidebar link
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+            
+            sidebarLinks.forEach(link => {
+                // Remove active class from all links
+                link.classList.remove('active');
+                
+                // Check if this link matches current path
+                const linkPath = link.getAttribute('href');
+                if (currentPath.includes(linkPath) && linkPath !== '/') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Dashboard link should be active by default on dashboard
+            if (currentPath.includes('dashboard')) {
+                const dashboardLink = document.querySelector('.sidebar-menu a[href*="dashboard"]');
+                if (dashboardLink) {
+                    dashboardLink.classList.add('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

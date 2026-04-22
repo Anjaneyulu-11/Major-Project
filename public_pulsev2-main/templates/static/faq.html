@@ -1,0 +1,706 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    .faq-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 80px);
+        padding: 3rem 0;
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .section-header h1 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+        border-radius: 2px;
+    }
+    
+    .section-header .lead {
+        color: #6c757d;
+        max-width: 600px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+    }
+    
+    .faq-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .faq-item {
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(13, 110, 253, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .faq-item:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .faq-question {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        background: rgba(13, 110, 253, 0.05);
+        border-bottom: 1px solid rgba(13, 110, 253, 0.1);
+    }
+    
+    .faq-question h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .faq-question h3 i {
+        color: #0d6efd;
+    }
+    
+    .faq-question .toggle-icon {
+        color: #0d6efd;
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .faq-answer {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .faq-answer.active {
+        padding: 1.5rem;
+        max-height: 500px;
+    }
+    
+    .faq-answer p {
+        margin: 0;
+        color: #5a6268;
+        line-height: 1.7;
+    }
+    
+    .search-box {
+        max-width: 500px;
+        margin: 2rem auto 3rem;
+    }
+    
+    .search-box input {
+        border-radius: 50px;
+        padding: 15px 25px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .faq-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .category-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 50px;
+        padding: 8px 20px;
+        color: #6c757d;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .category-btn:hover,
+    .category-btn.active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    
+    .contact-support {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-top: 5px solid #28a745;
+    }
+    
+    .contact-support h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-support p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .back-home {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .back-home a {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-home a:hover {
+        color: #0a58ca;
+        transform: translateX(-5px);
+    }
+    
+    @media (max-width: 768px) {
+        .faq-question h3 {
+            font-size: 1.1rem;
+        }
+        
+        .faq-question {
+            padding: 1rem;
+        }
+        
+        .faq-answer.active {
+            padding: 1rem;
+        }
+        
+        .faq-categories {
+            gap: 5px;
+        }
+        
+        .category-btn {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="faq-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>Frequently Asked Questions</h1>
+            <p class="lead">Find quick answers to common questions about Public Pulse</p>
+        </div>
+        
+        <!-- Back to Home Link -->
+        <div class="back-home">
+            <a href="{% url 'home' %}">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+        
+        <!-- Search Box -->
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for answers..." id="faqSearch">
+                <button class="btn btn-primary" type="button" id="searchButton">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+        
+        <!-- FAQ Categories -->
+        <div class="faq-categories">
+            <a href="#general" class="category-btn active" data-category="all">All Questions</a>
+            <a href="#general" class="category-btn" data-category="complaint">Complaint Process</a>
+            <a href="#general" class="category-btn" data-category="account">Account & Registration</a>
+            <a href="#general" class="category-btn" data-category="ai">AI Features</a>
+            <a href="#general" class="category-btn" data-category="security">Security & Privacy</a>
+        </div>
+        
+        <!-- FAQ Items -->
+        <div class="faq-container" id="faqContainer">
+            <!-- Main FAQ Items from views.py -->
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-item" data-category="complaint">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>
+                            <i class="fas fa-question-circle"></i>
+                            {{ faq.question }}
+                        </h3>
+                        <span class="toggle-icon">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>{{ faq.answer }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Additional FAQ Items (Hardcoded for backup) -->
+            
+            <!-- Complaint Process FAQs -->
+            <div class="faq-item" data-category="complaint">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-edit"></i>
+                        How do I lodge a complaint?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Go to "Lodge Complaint" page, fill in your details, select the category, describe your issue in detail, and submit. You will receive a unique Complaint ID for tracking.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="complaint">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-search"></i>
+                        How do I track my complaint?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Use the "Track Complaint" page and enter your Complaint ID. You can also login to your account to see all your complaints and their current status.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="complaint">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-id-card"></i>
+                        What is a Complaint ID?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>A unique identification number generated when you submit a complaint. It starts with "PP" followed by date and random characters (e.g., PP20231215ABC12). Keep this ID safe for tracking your complaint.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="complaint">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-clock"></i>
+                        How long does it take to resolve complaints?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Resolution time varies: Simple issues: 3-5 working days, Moderate issues: 5-10 working days, Complex issues: 10-15 working days. You will receive regular updates about your complaint's progress.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="complaint">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-file-upload"></i>
+                        What file types can I upload with my complaint?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>You can upload images (JPG, PNG, GIF), PDF documents, and Word files (DOC, DOCX). Maximum file size is 10MB per file, with up to 5 files per complaint. Supported formats help us better understand and process your complaint.</p>
+                </div>
+            </div>
+            
+            <!-- Account & Registration FAQs -->
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-user-circle"></i>
+                        Is registration free?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes! Public Pulse is completely free for citizens. There are no registration fees, subscription charges, or hidden costs. Our service is funded to promote transparent governance.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-key"></i>
+                        What if I forget my password?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Click on "Forgot Password" on the login page. Enter your registered email address, and we'll send you a password reset link. Follow the instructions in the email to create a new password.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="account">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-user-plus"></i>
+                        Do I need to create an account to lodge a complaint?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>You can submit complaints without an account, but creating one helps track all complaints easily and provides additional features like notifications and complaint history.</p>
+                </div>
+            </div>
+            
+            <!-- AI Features FAQs -->
+            <div class="faq-item" data-category="ai">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-robot"></i>
+                        How does the AI chatbot work?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Our AI chatbot uses natural language processing to understand your queries. It can help you draft complaints, track existing complaints, answer questions about the process, and guide you through the system. It's available 24/7 for instant assistance.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="ai">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-brain"></i>
+                        How accurate is the AI analysis?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Our AI system has an accuracy rate of over 92% for complaint categorization and priority detection. It continuously learns from new data and improves over time. All AI suggestions are reviewed by our system administrators before final processing.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="ai">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-chart-line"></i>
+                        How does AI help in complaint resolution?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>AI analyzes complaints to automatically categorize them, determine priority levels, detect sentiment for urgency, extract keywords, and route them to the appropriate departments. This reduces processing time by up to 80% compared to manual methods.</p>
+                </div>
+            </div>
+            
+            <!-- Security & Privacy FAQs -->
+            <div class="faq-item" data-category="security">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-shield-alt"></i>
+                        Is my personal data safe?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Absolutely! We use end-to-end encryption, secure socket layer (SSL) technology, and comply with all data protection regulations. Your personal information is never shared with third parties without your explicit consent. Read our <a href="{% url 'privacy_policy' %}">Privacy Policy</a> for more details.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="security">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-eye-slash"></i>
+                        Can complaints be submitted anonymously?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, you can submit complaints anonymously. However, anonymous complaints may have lower priority as we cannot provide updates or request additional information. For the best experience and resolution, we recommend using a registered account.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="security">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-lock"></i>
+                        How is my complaint data protected?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>All complaint data is stored on secure servers with multiple layers of encryption. Access is strictly controlled and logged. We regularly audit our security measures and comply with international data protection standards.</p>
+                </div>
+            </div>
+            
+            <!-- Support & Contact FAQs -->
+            <div class="faq-item" data-category="support">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-headset"></i>
+                        What are your customer support hours?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>Our support team is available Monday to Friday, 9:00 AM to 6:00 PM (local time). For urgent issues, you can use our AI chatbot which is available 24/7. You can also email us at support@publicpulse.com for non-urgent queries.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="support">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>
+                        <i class="fas fa-phone"></i>
+                        How can I contact your support team?
+                    </h3>
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    <p>You can contact us via email at support@publicpulse.com, use the contact form on our website, or call our helpline at +254 112 516 719 during business hours. For the fastest response, use our AI chatbot available 24/7.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Support Section -->
+        <div class="contact-support">
+            <h3>Still Have Questions?</h3>
+            <p>Can't find what you're looking for? Our support team is here to help you!</p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope me-2"></i> Contact Support
+                </a>
+                <a href="{% url 'how_it_works' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-play-circle me-2"></i> How It Works
+                </a>
+            </div>
+        </div>
+        
+        <!-- Quick Links Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-file-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Privacy Policy</h5>
+                        <p class="card-text">Learn how we protect your data and ensure your privacy.</p>
+                        <a href="{% url 'privacy_policy' %}" class="btn btn-outline-primary">Read Policy</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-book fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Terms & Conditions</h5>
+                        <p class="card-text">Read our terms of service and user agreement.</p>
+                        <a href="{% url 'terms_conditions' %}" class="btn btn-outline-success">View Terms</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-question-circle fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Need Help?</h5>
+                        <p class="card-text">Visit our comprehensive help center for detailed guides.</p>
+                        <a href="{% url 'how_it_works' %}" class="btn btn-outline-info">Get Help</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle FAQ Answer
+    function toggleFAQ(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('.toggle-icon i');
+        
+        // Close all other FAQs (optional)
+        // document.querySelectorAll('.faq-answer.active').forEach(activeAnswer => {
+        //     if (activeAnswer !== answer) {
+        //         activeAnswer.classList.remove('active');
+        //         activeAnswer.previousElementSibling.querySelector('.toggle-icon i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+        //     }
+        // });
+        
+        answer.classList.toggle('active');
+        
+        if (answer.classList.contains('active')) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+    
+    // Search functionality
+    document.getElementById('searchButton').addEventListener('click', searchFAQ);
+    document.getElementById('faqSearch').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') searchFAQ();
+    });
+    
+    function searchFAQ() {
+        const searchTerm = document.getElementById('faqSearch').value.toLowerCase().trim();
+        const faqItems = document.querySelectorAll('.faq-item');
+        let foundItems = false;
+        
+        if (searchTerm === '') {
+            // If search is empty, show all items
+            faqItems.forEach(item => {
+                item.style.display = 'block';
+            });
+            return;
+        }
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
+            const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                item.style.display = 'block';
+                item.querySelector('.faq-question').click(); // Open matching items
+                foundItems = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Show message if no results found
+        const noResultsMsg = document.getElementById('noResults');
+        if (!foundItems) {
+            if (!noResultsMsg) {
+                const container = document.getElementById('faqContainer');
+                const message = document.createElement('div');
+                message.id = 'noResults';
+                message.className = 'alert alert-info text-center';
+                message.innerHTML = `
+                    <i class="fas fa-info-circle me-2"></i>
+                    No FAQs found matching "${searchTerm}". Try different keywords or browse categories.
+                `;
+                container.prepend(message);
+            }
+        } else if (noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+    
+    // Category filtering
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const category = this.getAttribute('data-category');
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            // Clear search
+            document.getElementById('faqSearch').value = '';
+            
+            // Remove no results message if exists
+            const noResultsMsg = document.getElementById('noResults');
+            if (noResultsMsg) noResultsMsg.remove();
+            
+            faqItems.forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Open first FAQ by default
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstFAQ = document.querySelector('.faq-item');
+        if (firstFAQ) {
+            firstFAQ.querySelector('.faq-question').click();
+        }
+        
+        // Add smooth scrolling for category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('faqContainer').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

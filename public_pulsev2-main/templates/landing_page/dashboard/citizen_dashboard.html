@@ -1,0 +1,547 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Civic Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #667eea;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+    }
+
+    .dashboard-container {
+        min-height: calc(100vh - 76px);
+        background: #f8f9fa;
+    }
+
+    .sidebar {
+        background: var(--primary-color);
+        color: white;
+        min-height: calc(100vh - 76px);
+        padding: 0;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 12px 20px;
+        margin: 2px 0;
+        border-left: 4px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--accent-color);
+    }
+
+    .sidebar .nav-link.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.15);
+        border-left-color: var(--secondary-color);
+    }
+
+    .sidebar .nav-link i {
+        width: 24px;
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    .user-profile-sidebar {
+        padding: 25px 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-color), #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .user-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .user-role {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .main-content {
+        padding: 30px;
+        background: #f8f9fa;
+    }
+
+    .dashboard-header {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .welcome-message h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .welcome-message p {
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        height: 100%;
+        text-align: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 20px;
+    }
+
+    .stat-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    /* Different colors for each stat card */
+    .stat-total .stat-icon {
+        background: rgba(102, 126, 234, 0.1);
+        color: var(--accent-color);
+    }
+    
+    .stat-resolved .stat-icon {
+        background: rgba(39, 174, 96, 0.1);
+        color: var(--success-color);
+    }
+    
+    .stat-progress .stat-icon {
+        background: rgba(243, 156, 18, 0.1);
+        color: var(--warning-color);
+    }
+    
+    .stat-pending .stat-icon {
+        background: rgba(231, 76, 60, 0.1);
+        color: var(--danger-color);
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 100%;
+        text-align: center;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        border-color: var(--accent-color);
+    }
+
+    .action-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: var(--secondary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    .action-card.ai-highlight .action-icon {
+        background: linear-gradient(135deg, var(--accent-color), #764ba2);
+    }
+
+    .action-card h4 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .action-card p {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .btn-action {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .ai-assistant-btn {
+        background: linear-gradient(135deg, var(--accent-color), #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .ai-assistant-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* View All Button */
+    .view-all-section {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        margin-top: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .sidebar {
+            min-height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .main-content {
+            padding: 15px;
+        }
+        
+        .dashboard-header {
+            padding: 20px;
+        }
+        
+        .welcome-message h1 {
+            font-size: 1.5rem;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+        }
+    }
+    /* Add to existing styles in citizen_dashboard.html */
+
+/* Sidebar Sections */
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-section h6 {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+/* Headphones stats */
+.stat-card {
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* Table badges */
+.badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badge-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-under-review {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-resolved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Status message */
+.alert-info {
+    border-left: 5px solid #0dcaf0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-lg-2">
+            <div class="sidebar">
+    <!-- User Profile -->
+    <div class="user-profile-sidebar">
+        <div class="user-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="user-role">
+            Citizen
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav flex-column py-3">
+        <!-- UPDATED: Telephone Section as per your image -->
+        <div class="sidebar-section mt-3">
+            <h6 class="px-3"><i class="fas fa-phone-alt me-2"></i>Telephone</h6>
+            <a class="nav-link" href="#">
+                <i class="fas fa-phone me-2"></i> Emergency
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-headset me-2"></i> Support
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-comments me-2"></i> Feedback
+            </a>
+        </div>
+
+        <!-- UPDATED: Citizen Name Section -->
+        <div class="sidebar-section">
+            <h6 class="px-3"><i class="fas fa-user-tie me-2"></i>Citizen</h6>
+            <div class="px-3 mb-2">
+                <small class="text-muted">Name:</small>
+                <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+            </div>
+        </div>
+
+        <!-- UPDATED: Complaint Quick Links -->
+        <div class="sidebar-section">
+            <h6 class="px-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
+            <a class="nav-link" href="{% url 'lodge_complaint' %}">
+                <i class="fas fa-plus-circle me-2"></i> 10kgc (complaint)
+            </a>
+            <a class="nav-link" href="{% url 'track_complaint' %}">
+                <i class="fas fa-search me-2"></i> Track (complaint)
+            </a>
+            <a class="nav-link" href="{% url 'my_complaints' %}">
+                <i class="fas fa-list-alt me-2"></i> my complaints
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-download me-2"></i> getting
+            </a>
+            <a class="nav-link" href="{% url 'how_it_works' %}">
+                <i class="fas fa-info-circle me-2"></i> How it works
+            </a>
+        </div>
+
+        <!-- UPDATED: Lack & Inference Section -->
+        <div class="sidebar-section">
+            <h6 class="px-3"><i class="fas fa-exclamation-triangle me-2"></i>Lack & Inference</h6>
+            <a class="nav-link" href="#">
+                <i class="fas fa-tools me-2"></i> Lack
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-chart-bar me-2"></i> Inference
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-sign-in-alt me-2"></i> Login
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-sign-in-alt me-2"></i> Login
+            </a>
+        </div>
+
+        <!-- Logout -->
+        <div class="mt-4 px-3">
+            <a href="{% url 'logout' %}" class="btn btn-outline-light w-100">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+        </div>
+    </nav>
+</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-10">
+            <div class="main-content">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div class="welcome-message">
+                        <h1><i class="fas fa-user-circle me-2"></i>Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                        <p>Track your complaint submissions and stay updated on community issues.</p>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-4">
+                        <div class="stat-card stat-total">
+                            <div class="stat-icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <div class="stat-number">{{ total_complaints|default:"0" }}</div>
+                            <div class="stat-label">Total Complaints</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-4">
+                        <div class="stat-card stat-resolved">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-number">{{ resolved_complaints|default:"0" }}</div>
+                            <div class="stat-label">Resolved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-4">
+                        <div class="stat-card stat-progress">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-number">{{ in_progress_complaints|default:"0" }}</div>
+                            <div class="stat-label">In Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-4">
+                        <div class="stat-card stat-pending">
+                            <div class="stat-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="stat-number">{{ pending_complaints|default:"0" }}</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12 mb-4">
+                        <h4 class="mb-4"><i class="fas fa-bolt me-2"></i>Quick Actions</h4>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <h4>Lodge Complaint</h4>
+                            <p>Submit a new complaint with details, location, and images.</p>
+                            <a href="{% url 'lodge_complaint' %}" class="btn-action">
+                                <i class="fas fa-plus-circle me-2"></i>Submit Complaint
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h4>Track Complaint</h4>
+                            <p>Check the status of your submitted complaints using Complaint ID.</p>
+                            <a href="{% url 'track_complaint' %}" class="btn-action">
+                                <i class="fas fa-search me-2"></i>Track Now
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="action-card ai-highlight">
+                            <div class="action-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h4>AI Assistant</h4>
+                            <p>Get help with your complaints, check status updates and get recommendations.</p>
+                            <a href="{% url 'chatbot' %}" class="ai-assistant-btn">
+                                <i class="fas fa-comments me-2"></i>Chat Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View All Complaints Button -->
+                <div class="view-all-section">
+                    <h4 class="mb-3"><i class="fas fa-list-alt me-2"></i>View All Your Complaints</h4>
+                    <p class="text-muted mb-4">See detailed information about all your submitted complaints in one place.</p>
+                    <a href="{% url 'my_complaints' %}" class="btn-action" style="padding: 12px 30px; font-size: 1.1rem;">
+                        <i class="fas fa-external-link-alt me-2"></i>Go to My Complaints
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

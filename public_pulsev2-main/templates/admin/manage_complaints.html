@@ -1,0 +1,784 @@
+{% extends 'admin/admin_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid p-0">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="page-title">
+                    <h1><i class="fas fa-comments me-2"></i> Chatboard - Manage Complaints</h1>
+                    <p>Review, assign, and resolve citizen complaints efficiently</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="input-group me-3" style="max-width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search complaints..." id="searchInput">
+                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">{{ request.user.first_name|first }}{{ request.user.last_name|first }}</div>
+                        <div>
+                            <div class="fw-bold">{{ request.user.get_full_name }}</div>
+                            <div class="small text-muted">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Stats Overview -->
+    <div class="dashboard-cards mb-4">
+        <div class="dashboard-card">
+            <div class="card-icon complaints">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="card-value">{{ total }}</div>
+            <div class="card-label">Total Complaints</div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon" style="background-color: rgba(243, 156, 18, 0.1); color: #f39c12;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-value">{{ complaints|filter_status:'pending'|length }}</div>
+            <div class="card-label">Pending</div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon" style="background-color: rgba(52, 152, 219, 0.1); color: #3498db;">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div class="card-value">{{ complaints|filter_status:'in_progress'|length }}</div>
+            <div class="card-label">In Progress</div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-icon" style="background-color: rgba(46, 204, 113, 0.1); color: #27ae60;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="card-value">{{ complaints|filter_status:'resolved'|length }}</div>
+            <div class="card-label">Resolved</div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="dashboard-section mb-4">
+        <div class="section-header">
+            <h2 class="section-title"><i class="fas fa-filter me-2"></i> Filter Complaints</h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                    <i class="fas fa-redo me-1"></i> Reset
+                </button>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-check me-1"></i> Apply
+                </button>
+            </div>
+        </div>
+        
+        <form method="GET" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="all" {% if current_status == 'all' or not current_status %}selected{% endif %}>All Status</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="all" {% if current_category == 'all' or not current_category %}selected{% endif %}>All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if current_category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="all" {% if current_department == 'all' or not current_department %}selected{% endif %}>All Departments</option>
+                        {% for department in departments %}
+                        <option value="{{ department.id }}" {% if current_department == department.id|stringformat:"i" %}selected{% endif %}>{{ department.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <div class="input-group">
+                        <input type="date" name="date_from" class="form-control" 
+                               value="{{ request.GET.date_from|default:'' }}">
+                        <span class="input-group-text">to</span>
+                        <input type="date" name="date_to" class="form-control" 
+                               value="{{ request.GET.date_to|default:'' }}">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="dashboard-section mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0"><i class="fas fa-list-alt me-2"></i> Complaint List</h3>
+                <p class="text-muted mb-0">{{ total }} complaints found</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-success" onclick="exportComplaints()">
+                    <i class="fas fa-file-export me-1"></i> Export CSV
+                </button>
+                <button class="btn btn-primary" onclick="showBulkActionModal()">
+                    <i class="fas fa-cogs me-1"></i> Bulk Actions
+                </button>
+                <button class="btn btn-info" onclick="refreshTable()">
+                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaints Table -->
+    <div class="dashboard-section">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th width="50">
+                            <input type="checkbox" class="form-check-input" id="selectAll">
+                        </th>
+                        <th>Complaint ID</th>
+                        <th>Citizen</th>
+                        <th>Complaint Details</th>
+                        <th>Category</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="form-check-input complaint-checkbox" value="{{ complaint.id }}">
+                        </td>
+                        <td>
+                            <strong class="text-primary">#{{ complaint.id }}</strong>
+                            {% if complaint.priority == 'high' %}
+                                <span class="badge bg-danger ms-1">High</span>
+                            {% elif complaint.priority == 'medium' %}
+                                <span class="badge bg-warning ms-1">Medium</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar-sm me-2">
+                                    {{ complaint.user.first_name|first }}{{ complaint.user.last_name|first }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ complaint.user.get_full_name }}</div>
+                                    <div class="small text-muted">{{ complaint.user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold mb-1">{{ complaint.title|truncatechars:40 }}</div>
+                            <div class="small text-muted">{{ complaint.description|truncatechars:60 }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info bg-opacity-10 text-info">
+                                {{ complaint.category.name|default:"General" }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if complaint.department %}
+                                <span class="badge bg-secondary">{{ complaint.department.name }}</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge 
+                                {% if complaint.status == 'pending' %}status-pending
+                                {% elif complaint.status == 'in_progress' %}status-in-progress
+                                {% elif complaint.status == 'resolved' %}status-resolved
+                                {% else %}status-rejected{% endif %}">
+                                {{ complaint.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="small">{{ complaint.created_at|date:"M d, Y" }}</div>
+                            <div class="small text-muted">{{ complaint.created_at|date:"h:i A" }}</div>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'pulse_admin:complaint_detail' complaint.id %}" 
+                                   class="btn btn-outline-primary" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button class="btn btn-outline-success" 
+                                        onclick="updateStatus({{ complaint.id }}, 'in_progress')"
+                                        title="Mark as In Progress">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" 
+                                        onclick="updateStatus({{ complaint.id }}, 'pending')"
+                                        title="Mark as Pending">
+                                    <i class="fas fa-pause"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" 
+                                        onclick="updateStatus({{ complaint.id }}, 'rejected')"
+                                        title="Reject Complaint">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <div class="py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No complaints found</h5>
+                                <p class="text-muted">Try adjusting your filters or check back later.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if complaints.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if complaints.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ complaints.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in complaints.paginator.page_range %}
+                    {% if complaints.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > complaints.number|add:'-3' and num < complaints.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if complaints.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ complaints.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ complaints.paginator.num_pages }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Complaint Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="statusSelect">
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Admin Comments</label>
+                    <textarea class="form-control" id="adminComments" rows="3" 
+                              placeholder="Add any comments or notes..."></textarea>
+                </div>
+                <input type="hidden" id="complaintId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveStatus">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Action Modal -->
+<div class="modal fade" id="bulkActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Action</label>
+                    <select class="form-select" id="bulkActionSelect">
+                        <option value="">Choose an action...</option>
+                        <option value="assign_department">Assign to Department</option>
+                        <option value="assign_officer">Assign to Officer</option>
+                        <option value="mark_resolved">Mark as Resolved</option>
+                        <option value="delete">Delete Selected</option>
+                    </select>
+                </div>
+                
+                <div id="actionFields" style="display: none;">
+                    <!-- Dynamic fields based on selected action -->
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span id="selectedCount">0</span> complaints selected
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="executeBulkAction">Execute</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Complaints</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Export Format</label>
+                    <select class="form-select" id="exportFormat">
+                        <option value="csv">CSV (Excel)</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Include Data</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="includeUserInfo" checked>
+                        <label class="form-check-label" for="includeUserInfo">
+                            User Information
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="includeComments" checked>
+                        <label class="form-check-label" for="includeComments">
+                            Admin Comments
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="includeFullDescription" checked>
+                        <label class="form-check-label" for="includeFullDescription">
+                            Full Description
+                        </label>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Exporting will include all filtered results ({{ total }} complaints)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmExport()">
+                    <i class="fas fa-download me-1"></i> Download Export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Status update function
+    function updateStatus(complaintId, status) {
+        document.getElementById('complaintId').value = complaintId;
+        document.getElementById('statusSelect').value = status;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+        modal.show();
+    }
+
+    // Save status
+    document.getElementById('saveStatus').addEventListener('click', function() {
+        const complaintId = document.getElementById('complaintId').value;
+        const status = document.getElementById('statusSelect').value;
+        const comments = document.getElementById('adminComments').value;
+        
+        // Send AJAX request
+        fetch(`{% url 'pulse_admin:update_complaint_status' 0 %}`.replace('0', complaintId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                status: status,
+                admin_comment: comments
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('statusModal'));
+                modal.hide();
+                
+                // Reload page after short delay
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating status');
+        });
+    });
+
+    // Select All functionality
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.complaint-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+
+    // Update selected count when checkboxes change
+    document.querySelectorAll('.complaint-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedCount);
+    });
+
+    function updateSelectedCount() {
+        const selected = document.querySelectorAll('.complaint-checkbox:checked').length;
+        document.getElementById('selectedCount').textContent = selected;
+    }
+
+    // Bulk action functionality
+    function showBulkActionModal() {
+        const selected = document.querySelectorAll('.complaint-checkbox:checked').length;
+        if (selected === 0) {
+            alert('Please select at least one complaint');
+            return;
+        }
+        
+        updateSelectedCount();
+        const modal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
+        modal.show();
+    }
+
+    // Bulk action form handling
+    document.getElementById('bulkActionSelect').addEventListener('change', function() {
+        const action = this.value;
+        const actionFields = document.getElementById('actionFields');
+        
+        let html = '';
+        
+        switch(action) {
+            case 'assign_department':
+                html = `
+                    <div class="mb-3">
+                        <label class="form-label">Select Department</label>
+                        <select class="form-select" id="bulkDepartment">
+                            <option value="">Select department...</option>
+                            {% for department in departments %}
+                            <option value="{{ department.id }}">{{ department.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                `;
+                break;
+                
+            case 'assign_officer':
+                html = `
+                    <div class="mb-3">
+                        <label class="form-label">Select Officer</label>
+                        <select class="form-select" id="bulkOfficer">
+                            <option value="">Select officer...</option>
+                            <!-- Add officer options from your system -->
+                            <option value="{{ request.user.id }}">Myself ({{ request.user.get_full_name }})</option>
+                        </select>
+                    </div>
+                `;
+                break;
+                
+            case 'mark_resolved':
+                html = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        This will mark all selected complaints as resolved.
+                    </div>
+                `;
+                break;
+                
+            case 'delete':
+                html = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All selected complaints will be permanently deleted.
+                    </div>
+                `;
+                break;
+        }
+        
+        actionFields.innerHTML = html;
+        actionFields.style.display = html ? 'block' : 'none';
+    });
+
+    // Execute bulk action
+    document.getElementById('executeBulkAction').addEventListener('click', function() {
+        const action = document.getElementById('bulkActionSelect').value;
+        const complaintIds = Array.from(document.querySelectorAll('.complaint-checkbox:checked')).map(cb => cb.value);
+        
+        if (!action) {
+            alert('Please select an action');
+            return;
+        }
+        
+        let url = '{% url "pulse_admin:bulk_operations" %}';
+        let data = {
+            complaint_ids: complaintIds,
+            action: action
+        };
+        
+        // Add additional data based on action
+        if (action === 'assign_department') {
+            const departmentId = document.getElementById('bulkDepartment').value;
+            if (!departmentId) {
+                alert('Please select a department');
+                return;
+            }
+            data.department_id = departmentId;
+        } else if (action === 'assign_officer') {
+            const officerId = document.getElementById('bulkOfficer').value;
+            if (!officerId) {
+                alert('Please select an officer');
+                return;
+            }
+            data.officer_id = officerId;
+        } else if (action === 'delete') {
+            if (!confirm(`Are you sure you want to delete ${complaintIds.length} complaint(s)? This action cannot be undone.`)) {
+                return;
+            }
+        }
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('bulkActionModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error executing bulk action');
+        });
+    });
+
+    // Export functionality
+    function exportComplaints() {
+        const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+        modal.show();
+    }
+
+    function confirmExport() {
+        // Build export URL with current filters
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'true');
+        
+        // Close modal and redirect to export URL
+        const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+        modal.hide();
+        
+        // Redirect to export endpoint
+        window.location.href = '{% url "pulse_admin:export_complaints" %}?' + params.toString();
+    }
+
+    // Filter functions
+    function applyFilters() {
+        document.getElementById('filterForm').submit();
+    }
+
+    function resetFilters() {
+        window.location.href = window.location.pathname;
+    }
+
+    // Search functionality
+    document.getElementById('searchButton').addEventListener('click', function() {
+        const searchTerm = document.getElementById('searchInput').value;
+        if (searchTerm) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('search', searchTerm);
+            window.location.href = window.location.pathname + '?' + params.toString();
+        }
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('searchButton').click();
+        }
+    });
+
+    function refreshTable() {
+        location.reload();
+    }
+
+    // CSRF token helper
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Auto-update selected count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSelectedCount();
+        
+        // Auto-apply filters when select changes (for better UX)
+        document.querySelectorAll('#filterForm select').forEach(select => {
+            select.addEventListener('change', applyFilters);
+        });
+    });
+</script>
+
+<style>
+    /* Additional custom styles for this page */
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pending {
+        background-color: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+    }
+    
+    .status-in-progress {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+    
+    .status-resolved {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+    }
+    
+    .status-rejected {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+    
+    .user-avatar-sm {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+    
+    .badge {
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    .btn-group .btn {
+        padding: 5px 10px;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #5a5c69;
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e3e6f0;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .pagination .page-link {
+        color: #4e73df;
+        border: 1px solid #ddd;
+        margin: 0 2px;
+        border-radius: 4px;
+    }
+    
+    .pagination .page-link.active {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        color: white;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

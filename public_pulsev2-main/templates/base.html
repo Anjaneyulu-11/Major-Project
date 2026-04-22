@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Civic Pulse - AI-Powered Citizen Feedback System{% endblock %}</title>
+
+    {% load static %}
+    {% load i18n %}  {# ✅ Django i18n template tags #}
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <!-- Accessibility & Language Controls -->
+    <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+    <!-- Additional styles -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    {% block styles %}{% endblock %}
+
+    <style>
+        body {
+            padding-top: 90px;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fixed-nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ✅ FIXED: SIMPLIFIED LOGO SECTION WITH TYPEWRITER EFFECT */
+        .navbar-brand-complete {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            padding-right: 30px;
+            margin-right: 30px;
+            min-width: auto;
+        }
+
+        .logo-container-fixed {
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            flex-shrink: 0;
+            border: 1px solid transparent;
+        }
+
+        .logo-img-fixed {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-text-complete {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            text-align: left;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ✅ TYPEWRITER EFFECT FOR MAIN TITLE */
+        .brand-main-complete {
+            font-size: 1.6rem !important;
+            font-weight: 900 !important;
+            color: #000000 !important;
+            letter-spacing: 1px;
+            text-transform: uppercase !important;
+            margin-bottom: 2px;
+            line-height: 1.1;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            border-right: 3px solid #0d6efd;
+            animation: 
+                typing 2.5s steps(11, end),
+                blink-caret 0.75s step-end infinite;
+        }
+
+        /* Typewriter animation */
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        /* Blinking cursor effect */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #0d6efd; }
+        }
+
+        /* ✅ TYPEWRITER EFFECT FOR SUBTITLE */
+        .brand-sub-complete {
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            color: #666666 !important;
+            letter-spacing: 0.3px;
+            line-height: 1.1;
+            white-space: nowrap;
+            text-transform: none;
+            max-width: 250px;
+            position: relative;
+            overflow: hidden;
+            border-right: 2px solid #0dcaf0;
+            animation: 
+                typing-sub 3s steps(30, end) 2.5s both,
+                blink-caret-sub 0.75s step-end infinite 2.5s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes typing-sub {
+            from { 
+                width: 0;
+                opacity: 1;
+            }
+            to { 
+                width: 100%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes blink-caret-sub {
+            from, to { border-color: transparent }
+            50% { border-color: #0dcaf0; }
+        }
+
+        /* ✅ SPARKLE EFFECT */
+        .sparkle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0, #ff6b6b, #ffd93d);
+            border-radius: 50%;
+            animation: sparkle 1.5s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes sparkle {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) rotate(360deg);
+            }
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 6px 10px !important;
+            margin: 0 2px !important;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: #0d6efd !important;
+            transform: translateY(-2px);
+            background: rgba(13, 110, 253, 0.05);
+        }
+
+        .nav-link.active {
+            color: #0d6efd !important;
+            background: rgba(13, 110, 253, 0.1);
+            font-weight: 600;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            color: white !important;
+            border-radius: 25px;
+            padding: 6px 15px !important;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+            background: linear-gradient(135deg, #0b5ed7, #0baccc);
+        }
+
+        .main-content {
+            flex: 1;
+            animation: fadeIn 0.5s ease;
+            padding-bottom: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ✅ ADD HERO SECTION FOR HOMEPAGE */
+        .home-hero {
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            color: white;
+            padding: 100px 0;
+            margin-top: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .hero-main-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .hero-button {
+            background: white;
+            color: #0d6efd;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hero-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            color: white;
+            margin-top: auto;
+            padding: 40px 0 20px;
+        }
+
+        .footer a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #0dcaf0;
+            text-decoration: underline;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            background: #0d6efd;
+            transform: translateY(-3px);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+        }
+
+        .alert-success {
+            border-left-color: #198754;
+        }
+
+        .alert-danger {
+            border-left-color: #dc3545;
+        }
+
+        .alert-warning {
+            border-left-color: #ffc107;
+        }
+
+        .alert-info {
+            border-left-color: #0dcaf0;
+        }
+
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.3s ease;
+            padding: 10px 0;
+            min-width: 200px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            padding-left: 25px;
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .contact-info i {
+            width: 20px;
+            margin-right: 10px;
+            color: #0dcaf0;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb-nav {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb {
+            margin-bottom: 0;
+            background: transparent;
+        }
+
+        .breadcrumb-item a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+            z-index: 99;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: #0b5ed7;
+            transform: translateY(-5px);
+        }
+
+        /* COMPACT NAVIGATION */
+        .navbar > .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .navbar-nav.ms-auto {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: nowrap;
+            margin-left: auto !important;
+        }
+
+        .navbar-nav.ms-auto .nav-item {
+            flex-shrink: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .navbar-brand-complete {
+                min-width: auto;
+                gap: 15px;
+            }
+            
+            .logo-container-fixed {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .brand-main-complete {
+                font-size: 1.4rem !important;
+            }
+            
+            .brand-sub-complete {
+                font-size: 0.7rem !important;
+                max-width: 200px;
+            }
+            
+            .hero-main-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 85px;
+            }
+
+            .navbar-brand-complete {
+                gap: 12px;
+                min-width: auto;
+                padding-right: 15px;
+                margin-right: 15px;
+            }
+
+            .logo-container-fixed {
+                width: 48px;
+                height: 48px;
+            }
+
+            .brand-main-complete {
+                font-size: 1.3rem !important;
+                animation: 
+                    typing-mobile 1.5s steps(11, end),
+                    blink-caret 0.75s step-end infinite;
+            }
+
+            .brand-sub-complete {
+                font-size: 0.65rem !important;
+                max-width: 170px;
+                animation: 
+                    typing-sub-mobile 2s steps(20, end) 1.5s both,
+                    blink-caret-sub 0.75s step-end infinite 1.5s;
+            }
+
+            @keyframes typing-mobile {
+                from { width: 0 }
+                to { width: 100% }
+            }
+
+            @keyframes typing-sub-mobile {
+                from { 
+                    width: 0;
+                    opacity: 1;
+                }
+                to { 
+                    width: 100%;
+                    opacity: 1;
+                }
+            }
+
+            .nav-link {
+                padding: 8px 12px !important;
+                margin: 2px 0 !important;
+                font-size: 0.9rem;
+            }
+
+            .btn-register {
+                padding: 8px 18px !important;
+            }
+
+            .navbar-nav.ms-auto {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 3px;
+                margin-top: 10px;
+            }
+
+            .dropdown-menu {
+                position: static !important;
+                float: none !important;
+                width: 100% !important;
+                margin-top: 0;
+                box-shadow: none;
+                border: 1px solid rgba(0,0,0,0.1);
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .hero-main-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+            
+            .home-hero {
+                padding: 60px 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding-top: 80px;
+            }
+
+            .navbar-brand-complete {
+                min-width: auto;
+                gap: 8px;
+            }
+
+            .logo-container-fixed {
+                width: 45px;
+                height: 45px;
+            }
+
+            .brand-main-complete {
+                font-size: 1.2rem !important;
+            }
+
+            .brand-sub-complete {
+                font-size: 0.6rem !important;
+                max-width: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 75px;
+            }
+
+            .navbar-brand-complete {
+                min-width: auto;
+                gap: 8px;
+            }
+
+            .logo-container-fixed {
+                width: 42px;
+                height: 42px;
+            }
+
+            .brand-main-complete {
+                font-size: 1.1rem !important;
+            }
+            
+            .brand-sub-complete {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-nav-bar">
+        <div class="container">
+            <!-- ✅ FIXED: CORRECT LOGO PATH - images/logo.png -->
+            <a class="navbar-brand-complete" href="{% url 'home' %}">
+                <div class="logo-container-fixed">
+                    <img id="civicLogo" 
+                         alt="Civic Pulse Logo" 
+                         class="logo-img-fixed"
+                         src="{% static 'images/logo.png' %}"
+                         onerror="this.onerror=null; 
+                                  console.log('Logo failed, trying fallback...');
+                                  this.src='/static/images/logo.png';">
+                </div>
+                <div class="brand-text-complete">
+                    <!-- Sparkle Container -->
+                    <div class="sparkle-container" id="sparkleContainer"></div>
+                    
+                    <!-- Main Title with Typewriter Effect -->
+                    <div class="brand-main-complete" id="mainTitle">CIVIC PULSE</div>
+                    
+                    <!-- Subtitle with Typewriter Effect -->
+                    <div class="brand-sub-complete" id="subTitle">Smart Civic Engagement Platform</div>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if request.path != '/complaints/lodge/' and request.path != '/complaints/track/' %}
+                <ul class="navbar-nav me-auto">
+    <!-- UPDATED: Changed from original to match your requirements -->
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+            <i class="fas fa-home me-1"></i> {% trans "Home" %}
+        </a>
+    </li>
+    
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'citizen_dashboard' %}">
+            <i class="fas fa-tachometer-alt me-1"></i> {% trans "Dashboard" %}
+        </a>
+    </li>
+    {% if request.path != '/profile/' %}
+    <li class="nav-item">
+        {# Keep Complaints menu active for complaint-related pages but exclude the Lodge Complaint form itself #}
+        <a class="nav-link {% if 'complaint' in request.path and request.path != '/complaints/lodge/' %}active{% endif %}" href="{% url 'lodge_complaint' %}">
+            <i class="fas fa-file-alt me-1"></i> {% trans "Complaints" %}
+        </a>
+    </li>
+    <li class="nav-item">
+        {# Mark Citizen active normally, but NOT on the lodge complaint form page #}
+        <a class="nav-link {% if request.resolver_match.url_name != 'lodge_complaint' and request.resolver_match.url_name != 'new_complaint' %}active{% endif %}" href="#">
+            <i class="fas fa-user me-1"></i> {% trans "Citizen" %}
+        </a>
+    </li>
+    {% endif %}
+    {% endif %}
+</ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <!-- How It Works moved to right side -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'how-it-works' in request.path %}active{% endif %}" href="{% url 'how_it_works' %}">
+                            <i class="fas fa-info-circle me-1"></i> {% trans "How it Works" %}
+                        </a>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link text-warning fw-bold" href="{% url 'admin_dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-1"></i> {% trans "Admin Dashboard" %}
+                                </a>
+                            </li>
+                        {% else %}
+                            {% if request.path != '/profile/' %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'my-complaints' in request.path %}active{% endif %}" href="{% url 'my_complaints' %}">
+                                    <i class="fas fa-list me-1"></i> {% trans "My Complaints" %}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if request.path != '/profile/' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span class="d-none d-md-inline">{{ user.username|truncatechars:15 }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'profile' %}">
+                                        <i class="fas fa-user me-2"></i> {% trans "Profile" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-key me-2"></i> {% trans "Change Password (Coming Soon)" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'history' %}">
+                                        <i class="fas fa-history me-2"></i> {% trans "Complaint History" %}
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                        <i class="fas fa-sign-out-alt me-2"></i> {% trans "Logout" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'login' in request.path %}active{% endif %}" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i> {% trans "Login" %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="{% url 'register' %}">
+                                <i class="fas fa-user-plus me-1"></i> {% trans "Register" %}
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <!-- Government Portal Style Controls -->
+                    <li class="nav-item">
+                        <div class="gov-controls-wrapper">
+                            <!-- ✅ Django i18n Language Selector -->
+                            <div id="langDropdownWrapper" class="lang-dropdown-wrapper">
+                                <button id="langToggle" class="gov-icon-btn" type="button" title="{% trans 'Select Language (Alt+L)' %}" aria-label="{% trans 'Language selector' %}">
+                                    <span class="lang-icon-text">अ A</span>
+                                </button>
+                                <div id="langDropdown" class="lang-dropdown-menu" style="display: none;">
+                                    <!-- Each language option is a form that POSTs to Django's set_language -->
+                                    {% get_available_languages as available_languages %}
+                                    {% for code, lang_name in LANGUAGES %}
+                                        <form method="post" action="/i18n/setlang/" style="display: none;" class="lang-form" data-lang="{{ code }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="language" value="{{ code }}">
+                                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}">
+                                        </form>
+                                        <button type="button" class="lang-option" data-lang="{{ code }}" onclick="document.querySelector('form.lang-form[data-lang=&quot;{{ code }}&quot;]').submit();">
+                                            {% if code == 'en' %}English
+                                            {% elif code == 'hi' %}हिन्दी (Hindi)
+                                            {% elif code == 'te' %}తెలుగు (Telugu)
+                                            {% elif code == 'ta' %}தமிழ் (Tamil)
+                                            {% elif code == 'kn' %}ಕನ್ನಡ (Kannada)
+                                            {% elif code == 'ml' %}മലയാളം (Malayalam)
+                                            {% elif code == 'mr' %}मराठी (Marathi)
+                                            {% elif code == 'bn' %}বাংলা (Bengali)
+                                            {% endif %}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="gov-control-divider" aria-hidden="true"></div>
+
+                            <!-- Accessibility Controls -->
+                            <button id="a11yToggle" class="gov-icon-btn" title="{% trans 'Accessibility Controls (Alt+A)' %}" aria-label="{% trans 'Accessibility panel' %}">
+                                <i class="fas fa-universal-access" style="width: 1em; height: 1em; display: inline-block;"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Accessibility Panel Backdrop -->
+    <div id="a11yBackdrop" class="accessibility-panel-backdrop" style="display: none;"></div>
+
+    <!-- Accessibility Control Panel - Government Portal Style -->
+    <div id="a11yPanel" class="accessibility-panel" style="display: none;">
+        <div class="accessibility-panel-header">
+            <h2 class="accessibility-panel-title">
+                <i class="fas fa-universal-access"></i>&nbsp; Accessibility
+            </h2>
+            <button id="a11yCloseBtn" class="accessibility-panel-close" aria-label="Close accessibility panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="accessibility-panel-content">
+            <!-- Dark Contrast -->
+            <button id="a11yDarkContrast" class="accessibility-control-btn" data-a11y-feature="dark-contrast" title="Toggle dark contrast mode">
+                <span class="accessibility-icon"><i class="fas fa-moon"></i></span>
+                <span>Dark Contrast</span>
+            </button>
+
+            <!-- Invert Colors -->
+            <button id="a11yInvertColors" class="accessibility-control-btn" data-a11y-feature="invert-colors" title="Toggle color inversion">
+                <span class="accessibility-icon"><i class="fas fa-palette"></i></span>
+                <span>Invert Colors</span>
+            </button>
+
+            <!-- Saturation Toggle -->
+            <button id="a11ySaturation" class="accessibility-control-btn" data-a11y-feature="saturation" title="Toggle saturation">
+                <span class="accessibility-icon"><i class="fas fa-image"></i></span>
+                <span>Saturation</span>
+            </button>
+
+            <!-- Text Size Increase -->
+            <button id="a11yTextIncrease" class="accessibility-control-btn" data-a11y-feature="text-increase" title="Increase text size">
+                <span class="accessibility-icon"><i class="fas fa-plus"></i></span>
+                <span>Text Size A+</span>
+            </button>
+
+            <!-- Text Size Decrease -->
+            <button id="a11yTextDecrease" class="accessibility-control-btn" data-a11y-feature="text-decrease" title="Decrease text size">
+                <span class="accessibility-icon"><i class="fas fa-minus"></i></span>
+                <span>Text Size A−</span>
+            </button>
+
+            <!-- Default Cursor -->
+            <button id="a11yCursorDefault" class="accessibility-control-btn" data-a11y-feature="cursor-default" title="Use default cursor">
+                <span class="accessibility-icon"><i class="fas fa-mouse-pointer"></i></span>
+                <span>Default Cursor</span>
+            </button>
+
+            <!-- Reset Button -->
+            <button id="a11yReset" class="accessibility-control-btn reset-btn" data-a11y-feature="reset" title="Reset all accessibility settings">
+                <span class="accessibility-icon"><i class="fas fa-redo"></i></span>
+                <span>Reset to Default</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Breadcrumb Navigation (Optional - can be added in specific pages) -->
+    {% block breadcrumb %}
+    {% if breadcrumbs %}
+    <div class="breadcrumb-nav">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% for crumb in breadcrumbs %}
+                    <li class="breadcrumb-item {% if forloop.last %}active{% endif %}">
+                        {% if not forloop.last %}
+                        <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                        {% else %}
+                        {{ crumb.name }}
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    <!-- Messages/Alerts -->
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="d-flex align-items-center">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle me-2"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                {% elif message.tags == 'info' %}
+                    <i class="fas fa-info-circle me-2"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        <!-- ✅ UPDATED HOMEPAGE CONTENT -->
+        {% if request.path == '/' %}
+        <div class="container">
+            <div class="home-hero">
+                <h1 class="hero-main-title">Civic Pulse</h1>
+                <p class="hero-subtitle">"Empowering students and citizens to report educational infrastructure and service issues."</p>
+                <button class="hero-button" onclick="window.location.href='{% url 'register' %}'">Get Started</button>
+            </div>
+        </div>
+        {% endif %}
+        {% endblock %}
+    </main>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h4 class="mb-3">Civic Pulse</h4>
+                    <p class="mb-3">AI-powered citizen feedback and grievance redressal system for transparent and efficient governance.</p>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'lodge_complaint' %}">Lodge Complaint</a></li>
+                        <li class="mb-2"><a href="{% url 'track_complaint' %}">Track Complaint</a></li>
+                        <li class="mb-2"><a href="{% url 'how_it_works' %}">How it Works</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Resources</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'faq' %}">FAQ</a></li>
+                        <li class="mb-2"><a href="{% url 'contact' %}">Contact Us</a></li>
+                        <li class="mb-2"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="{% url 'terms_conditions' %}">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <div class="contact-info">
+                        <p class="mb-2">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:support@publicpulse.com">support@publicpulse.com</a>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:publicpulse024@gmail.com">publicpulse024@gmail.com</a>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:+254112516719">+254 112 516 719</a>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                            14052 Lanet, Nakuru, Kenya
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p class="mb-0">&copy; {% now "Y" %} CIVIC PULSE. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0/min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if(targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Back to top button
+            const backToTopButton = document.getElementById('backToTop');
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+
+            backToTopButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Set active nav links
+            function setActiveNavLink() {
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+            setActiveNavLink();
+
+            // ✅ LOGO LOADING WITH FALLBACK
+            const logo = document.getElementById('civicLogo');
+            if (logo) {
+                console.log('Checking logo at:', logo.src);
+                
+                logo.addEventListener('load', function() {
+                    console.log('✅ Logo loaded successfully from:', this.src);
+                });
+                
+                logo.addEventListener('error', function() {
+                    console.log('❌ Logo failed to load from:', this.src);
+                    
+                    // Try different paths
+                    const pathsToTry = [
+                        '/static/images/logo.png',
+                        '{% static "images/logo.png" %}',
+                        '{% static "logo.png" %}',
+                        '/static/logo.png',
+                        'https://cdn-icons-png.flaticon.com/512/1006/1006363.png' // Simple flag icon as fallback
+                    ];
+                    
+                    let currentIndex = 0;
+                    
+                    function tryNextPath() {
+                        if (currentIndex < pathsToTry.length) {
+                            console.log('Trying logo path #' + (currentIndex + 1) + ':', pathsToTry[currentIndex]);
+                            this.src = pathsToTry[currentIndex];
+                            currentIndex++;
+                        } else {
+                            console.log('All logo paths failed');
+                            // Create a simple fallback
+                            const fallbackHTML = `
+                                <div style="width: 60px; height: 60px; 
+                                         background: linear-gradient(135deg, #0d6efd, #0dcaf0); 
+                                         border-radius: 10px; 
+                                         display: flex; 
+                                         align-items: center; 
+                                         justify-content: center; 
+                                         color: white;">
+                                    <i class="fas fa-flag" style="font-size: 24px;"></i>
+                                </div>
+                            `;
+                            this.outerHTML = fallbackHTML;
+                        }
+                    }
+                    
+                    // Start trying paths
+                    tryNextPath.call(this);
+                    
+                    // If this fails, try next path
+                    this.onerror = tryNextPath;
+                });
+            }
+
+            // ✅ SPARKLE ANIMATION FUNCTION
+            function createSparkles() {
+                const sparkleContainer = document.getElementById('sparkleContainer');
+                if (!sparkleContainer) return;
+                
+                const textContainer = sparkleContainer.parentElement;
+                const rect = textContainer.getBoundingClientRect();
+                
+                // Clear existing sparkles
+                sparkleContainer.innerHTML = '';
+                
+                // Create sparkles
+                const sparkleCount = 15;
+                for (let i = 0; i < sparkleCount; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    
+                    // Random position within the text area
+                    const left = Math.random() * rect.width;
+                    const top = Math.random() * rect.height;
+                    
+                    // Random delay
+                    const delay = Math.random() * 2;
+                    
+                    sparkle.style.left = left + 'px';
+                    sparkle.style.top = top + 'px';
+                    sparkle.style.animationDelay = delay + 's';
+                    
+                    sparkleContainer.appendChild(sparkle);
+                }
+            }
+
+            // ✅ INITIALIZE SPARKLES AFTER TYPEWRITER EFFECT
+            setTimeout(function() {
+                createSparkles();
+                // Refresh sparkles every 3 seconds
+                setInterval(createSparkles, 3000);
+            }, 5500); // Wait for typewriter animation to complete (2.5s + 3s = 5.5s)
+
+            // Get Started button
+            const getStartedBtn = document.querySelector('.hero-button');
+            if (getStartedBtn) {
+                getStartedBtn.addEventListener('click', function() {
+                    window.location.href = "{% url 'register' %}";
+                });
+            }
+
+            // ✅ RESET ANIMATIONS WHEN PAGE BECOMES VISIBLE AGAIN
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    // Reset animations
+                    const mainTitle = document.getElementById('mainTitle');
+                    const subTitle = document.getElementById('subTitle');
+                    
+                    if (mainTitle && subTitle) {
+                        mainTitle.style.animation = 'none';
+                        subTitle.style.animation = 'none';
+                        
+                        setTimeout(() => {
+                            mainTitle.style.animation = '';
+                            subTitle.style.animation = '';
+                        }, 10);
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Accessibility & Language Controls Script -->
+    <script src="{% static 'js/accessibility.js' %}"></script>
+
+</body>
+</html>

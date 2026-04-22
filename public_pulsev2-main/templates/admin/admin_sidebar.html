@@ -1,0 +1,554 @@
+{% load static %}
+<!-- Admin Sidebar Component -->
+<style>
+    :root {
+        --sidebar-bg: #1e293b;
+        --sidebar-active: #3b82f6;
+        --sidebar-hover: #334155;
+        --sidebar-text: #cbd5e1;
+        --sidebar-width: 280px;
+        --sidebar-collapsed: 70px;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-sidebar.collapsed {
+        width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+        padding: 25px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar.collapsed .sidebar-header {
+        padding: 20px 10px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: white;
+        font-size: 22px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar.collapsed .logo {
+        justify-content: center;
+    }
+
+    .logo img {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: contain;
+    }
+
+    .logo-text {
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .admin-sidebar.collapsed .logo-text {
+        display: none;
+    }
+
+    .logo-text span {
+        color: #3b82f6;
+    }
+
+    .admin-tag {
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        padding: 4px 12px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar.collapsed .admin-tag {
+        display: none;
+    }
+
+    .sidebar-navigation {
+        padding: 20px 0;
+    }
+
+    .nav-item {
+        list-style: none;
+        margin: 5px 0;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        color: var(--sidebar-text);
+        text-decoration: none;
+        padding: 12px 20px;
+        margin: 0 10px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .admin-sidebar.collapsed .nav-link {
+        padding: 15px;
+        justify-content: center;
+        margin: 0 5px;
+    }
+
+    .nav-link:hover {
+        background: var(--sidebar-hover);
+        color: white;
+        transform: translateX(3px);
+    }
+
+    .nav-link.active {
+        background: var(--sidebar-active);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: white;
+    }
+
+    .nav-icon {
+        width: 24px;
+        text-align: center;
+        font-size: 18px;
+        margin-right: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar.collapsed .nav-icon {
+        margin-right: 0;
+        font-size: 20px;
+    }
+
+    .nav-text {
+        flex: 1;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .admin-sidebar.collapsed .nav-text {
+        display: none;
+    }
+
+    .nav-badge {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-left: 8px;
+        font-weight: 600;
+    }
+
+    .admin-sidebar.collapsed .nav-badge {
+        display: none;
+    }
+
+    .sidebar-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 15px 20px;
+    }
+
+    .admin-sidebar.collapsed .sidebar-divider {
+        margin: 15px 10px;
+    }
+
+    .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: auto;
+    }
+
+    .admin-sidebar.collapsed .sidebar-footer {
+        padding: 15px 10px;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar.collapsed .user-profile {
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-info {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .admin-sidebar.collapsed .user-info {
+        display: none;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: white;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: var(--sidebar-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .toggle-sidebar {
+        position: absolute;
+        right: -12px;
+        top: 20px;
+        width: 24px;
+        height: 24px;
+        background: var(--sidebar-active);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid var(--sidebar-bg);
+        z-index: 1001;
+    }
+
+    .toggle-sidebar:hover {
+        transform: scale(1.1);
+    }
+
+    /* Custom scrollbar */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            width: var(--sidebar-collapsed);
+            transform: translateX(-100%);
+        }
+
+        .admin-sidebar.mobile-open {
+            transform: translateX(0);
+            width: var(--sidebar-width);
+        }
+
+        .toggle-sidebar {
+            display: none;
+        }
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-btn {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 999;
+        background: var(--sidebar-active);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-sidebar.mobile-open ~ .mobile-menu-btn {
+            left: calc(var(--sidebar-width) + 20px);
+        }
+    }
+</style>
+
+<!-- Mobile Menu Button (for mobile only) -->
+<button class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Sidebar -->
+<aside class="admin-sidebar" id="adminSidebar">
+    <div class="toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+
+    <div class="sidebar-header">
+        <a href="{% url 'pulse_admin:dashboard' %}" class="logo">
+            <img src="{% static 'Images/publicpulselogo.png' %}" alt="Public Pulse Logo">
+            <div class="logo-text">
+                <div>Public<span>Pulse</span></div>
+                <div class="admin-tag">
+                    <i class="fas fa-user-shield me-1"></i> Admin Panel
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <ul class="sidebar-navigation">
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt nav-icon"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:manage_complaints' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_complaints' %}active{% endif %}">
+                <i class="fas fa-comments nav-icon"></i>
+                <span class="nav-text">Chatboard</span>
+                {% if new_complaints_count %}
+                <span class="nav-badge">{{ new_complaints_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:user_management' %}" class="nav-link {% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+                <i class="fas fa-users nav-icon"></i>
+                <span class="nav-text">Manage User</span>
+            </a>
+        </li>
+
+        <div class="sidebar-divider"></div>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:interactions' %}" class="nav-link {% if request.resolver_match.url_name == 'interactions' %}active{% endif %}">
+                <i class="fas fa-history nav-icon"></i>
+                <span class="nav-text">Interactions</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:overallsentiments' %}" class="nav-link {% if request.resolver_match.url_name == 'overallsentiments' %}active{% endif %}">
+                <i class="fas fa-smile nav-icon"></i>
+                <span class="nav-text">Sentiment Analysis</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:recommendations' %}" class="nav-link {% if request.resolver_match.url_name == 'recommendations' %}active{% endif %}">
+                <i class="fas fa-lightbulb nav-icon"></i>
+                <span class="nav-text">Recommendations</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+                <i class="fas fa-chart-bar nav-icon"></i>
+                <span class="nav-text">Analytics</span>
+            </a>
+        </li>
+
+        <div class="sidebar-divider"></div>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:reports' %}" class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+                <i class="fas fa-file-alt nav-icon"></i>
+                <span class="nav-text">Reports</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'pulse_admin:settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog nav-icon"></i>
+                <span class="nav-text">Settings</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+            </div>
+            <div class="user-info">
+                <div class="user-name">{{ request.user.get_full_name }}</div>
+                <div class="user-role">Administrator</div>
+            </div>
+            <a href="{% url 'pulse_admin:admin_logout' %}" class="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt" style="color: #ef4444;"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<script>
+    // Sidebar toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('adminSidebar');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        // Toggle sidebar on desktop
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                const icon = this.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            });
+        }
+        
+        // Toggle mobile menu
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+        
+        // Auto-collapse on mobile when clicking a link
+        if (window.innerWidth <= 768) {
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    sidebar.classList.remove('mobile-open');
+                });
+            });
+        }
+        
+        // Set active state based on current URL
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const linkPath = link.getAttribute('href');
+                if (currentPath.includes(linkPath) && linkPath !== '/') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Handle exact root match
+            if (currentPath === '/' || currentPath === '/admin/' || currentPath === '/admin/dashboard/') {
+                document.querySelector('a[href="{% url 'pulse_admin:dashboard' %}"]').classList.add('active');
+            }
+        }
+        
+        setActiveNav();
+        
+        // Update active state on history change
+        window.addEventListener('popstate', setActiveNav);
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isClickInside = sidebar.contains(event.target) || mobileMenuBtn.contains(event.target);
+                if (!isClickInside && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+        
+        // Prevent body scroll when sidebar is open on mobile
+        sidebar.addEventListener('transitionend', function() {
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('mobile-open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+        
+        // Add active state to parent items
+        navLinks.forEach(link => {
+            if (link.classList.contains('active')) {
+                const parentItem = link.closest('.nav-item');
+                if (parentItem) {
+                    parentItem.classList.add('active-parent');
+                }
+            }
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('adminSidebar');
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('mobile-open');
+            sidebar.classList.remove('collapsed');
+            document.body.style.overflow = '';
+            document.getElementById('toggleSidebar').querySelector('i').className = 'fas fa-chevron-left';
+        }
+    });
+</script>

@@ -1,0 +1,424 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Analytics - Public Pulse{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="dashboard-header mb-4">
+        <div class="welcome-message">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-chart-bar me-2"></i>Analytics Dashboard</h1>
+                    <p>{% if department %}Analytics for {{ department.name }}{% else %}System-wide Analytics{% endif %}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <select class="form-select" id="timeRange" style="width: 200px;">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last Year</option>
+                    </select>
+                    <button class="btn btn-primary" id="exportBtn">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Total Feedback</h6>
+                            <h2 class="mb-0" id="totalFeedback">0</h2>
+                        </div>
+                        <i class="fas fa-comments fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Resolved</h6>
+                            <h2 class="mb-0" id="resolvedCount">0</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Pending</h6>
+                            <h2 class="mb-0" id="pendingCount">0</h2>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Avg. Response Time</h6>
+                            <h2 class="mb-0" id="avgResponseTime">0</h2>
+                        </div>
+                        <i class="fas fa-stopwatch fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Feedback Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Priority Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="priorityChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Top Categories</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Performance (for admin only) -->
+    {% if not department %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Department Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Total Feedback</th>
+                                    <th>Resolved</th>
+                                    <th>Pending</th>
+                                    <th>Resolution Rate</th>
+                                    <th>Avg. Response Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deptPerformance">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse JSON data from Django template
+        const statusData = JSON.parse('{{ status_counts|escapejs }}');
+        const priorityData = JSON.parse('{{ priority_counts|escapejs }}');
+        const dailyData = JSON.parse('{{ daily_submissions|escapejs }}');
+        const categoryData = JSON.parse('{{ category_counts|escapejs }}');
+        
+        // Initialize counters
+        let totalFeedback = 0;
+        let resolvedCount = 0;
+        let pendingCount = 0;
+        
+        // Calculate statistics
+        statusData.forEach(item => {
+            totalFeedback += item.count;
+            if (item.status === 'resolved') resolvedCount = item.count;
+            if (item.status === 'pending') pendingCount = item.count;
+        });
+        
+        // Update statistics cards
+        document.getElementById('totalFeedback').textContent = totalFeedback;
+        document.getElementById('resolvedCount').textContent = resolvedCount;
+        document.getElementById('pendingCount').textContent = pendingCount;
+        document.getElementById('avgResponseTime').textContent = '2.5 days';
+        
+        // 1. Trend Chart (Line Chart)
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const trendLabels = Object.keys(dailyData).reverse();
+        const trendValues = Object.values(dailyData).reverse();
+        
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Daily Submissions',
+                    data: trendValues,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 2. Status Distribution (Doughnut Chart)
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusLabels = statusData.map(item => {
+            // Convert status to readable format
+            const statusMap = {
+                'pending': 'Pending',
+                'under_review': 'Under Review',
+                'resolved': 'Resolved',
+                'rejected': 'Rejected'
+            };
+            return statusMap[item.status] || item.status;
+        });
+        const statusValues = statusData.map(item => item.count);
+        const statusColors = ['#ffc107', '#17a2b8', '#28a745', '#dc3545'];
+        
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusValues,
+                    backgroundColor: statusColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // 3. Priority Distribution (Bar Chart)
+        const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+        const priorityLabels = priorityData.map(item => {
+            const priorityMap = {
+                'low': 'Low',
+                'medium': 'Medium',
+                'high': 'High',
+                'critical': 'Critical'
+            };
+            return priorityMap[item.priority] || item.priority;
+        });
+        const priorityValues = priorityData.map(item => item.count);
+        const priorityColors = ['#28a745', '#ffc107', '#fd7e14', '#dc3545'];
+        
+        new Chart(priorityCtx, {
+            type: 'bar',
+            data: {
+                labels: priorityLabels,
+                datasets: [{
+                    label: 'Count',
+                    data: priorityValues,
+                    backgroundColor: priorityColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 4. Category Distribution (Horizontal Bar Chart)
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryLabels = categoryData.map(item => item.name);
+        const categoryValues = categoryData.map(item => item.count);
+        
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Feedback Count',
+                    data: categoryValues,
+                    backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                    borderColor: '#667eea',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Time range selector
+        document.getElementById('timeRange').addEventListener('change', function() {
+            alert('Time range changed to ' + this.value + ' days. This would refresh the data.');
+            // In production, you would make an AJAX call to reload data
+        });
+        
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            alert('Exporting analytics data...');
+            // In production, this would trigger a PDF/CSV export
+        });
+        
+        // Mock department performance data
+        const deptPerformance = [
+            { name: 'Municipal Corporation', total: 45, resolved: 32, pending: 13, rate: '71%', time: '2.1 days' },
+            { name: 'Public Works', total: 38, resolved: 28, pending: 10, rate: '74%', time: '1.8 days' },
+            { name: 'Health Department', total: 29, resolved: 18, pending: 11, rate: '62%', time: '3.2 days' },
+            { name: 'Education', total: 22, resolved: 15, pending: 7, rate: '68%', time: '2.5 days' },
+            { name: 'Police', total: 35, resolved: 25, pending: 10, rate: '71%', time: '2.3 days' }
+        ];
+        
+        // Populate department performance table
+        const deptTable = document.getElementById('deptPerformance');
+        deptPerformance.forEach(dept => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${dept.name}</strong></td>
+                <td>${dept.total}</td>
+                <td>${dept.resolved}</td>
+                <td>${dept.pending}</td>
+                <td>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" style="width: ${dept.rate}"></div>
+                    </div>
+                    <small>${dept.rate}</small>
+                </td>
+                <td>${dept.time}</td>
+            `;
+            deptTable.appendChild(row);
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 12px;
+        border: none;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 4px;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        background-color: #f8f9fa;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    select.form-select {
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+    }
+</style>
+{% endblock %}

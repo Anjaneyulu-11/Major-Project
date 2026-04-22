@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="padding:40px 0;">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card" style="padding:30px; background: linear-gradient(45deg,#ff9a9e,#fad0c4);">
+        <div style="text-align:center;">
+          <img src="/static/Images/default_avatar.png" alt="avatar" style="width:110px;height:110px;border-radius:8px;margin-bottom:15px;"/>
+          <h3>Welcome {{ profile.full_name|default:request.user.get_full_name }}</h3>
+          <p style="opacity:0.9">{{ profile.email|default:request.user.email }}</p>
+          <a href="{% url 'profile' %}" class="btn btn-primary" style="margin-top:12px;">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card" style="padding:24px; background: linear-gradient(135deg,#7de3c8,#66d3c2);">
+        <h4>Profile Information</h4>
+        <table class="table" style="background:transparent; margin-top:10px;">
+          <tr><th>First Name</th><td>{{ profile.first_name|default:request.user.first_name }}</td></tr>
+          <tr><th>Last Name</th><td>{{ profile.last_name|default:request.user.last_name }}</td></tr>
+          <tr><th>Email</th><td>{{ profile.email|default:request.user.email }}</td></tr>
+          <tr><th>Mobile No</th><td>{{ profile.phone|default:'-' }}</td></tr>
+          <tr><th>City</th><td>{{ profile.city|default:'-' }}</td></tr>
+          <tr><th>State</th><td>{{ profile.state|default:'-' }}</td></tr>
+          <tr><th>Password</th><td>********</td></tr>
+        </table>
+      </div>
+
+      <div class="row" style="margin-top:18px;">
+        <div class="col-md-4">
+          <a href="{% url 'lodge_complaint' %}" class="card text-center" style="padding:18px; display:block; text-decoration:none; color:inherit;">
+            <h5>📝 Lodge Complaint</h5>
+            <p>Submit a new grievance</p>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'track_complaint' %}" class="card text-center" style="padding:18px; display:block; text-decoration:none; color:inherit;">
+            <h5>🔎 Track Complaint</h5>
+            <p>Check status using your Complaint ID</p>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'how_it_works' %}" class="card text-center" style="padding:18px; display:block; text-decoration:none; color:inherit;">
+            <h5>ℹ️ How it Works</h5>
+            <p>Learn about our process</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department Portal - Civic Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    .portal-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 60px 0;
+    }
+
+    .portal-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .portal-header h1 {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .portal-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .departments-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .department-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        position: relative;
+    }
+
+    .department-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .department-card i.dept-icon {
+        font-size: 3.5rem;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .department-card:hover i.dept-icon {
+        transform: scale(1.1);
+    }
+
+    .department-card .dept-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .department-card .dept-subtitle {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        font-weight: 400;
+        margin-bottom: 15px;
+    }
+
+    .department-card .dept-arrow {
+        margin-top: auto;
+        color: #24CFED;
+        font-size: 1.2rem;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .department-card:hover .dept-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Department Colors */
+    .dept-corruption i.dept-icon { color: #e74c3c; }
+    .dept-corruption:hover { border-top: 4px solid #e74c3c; }
+
+    .dept-education i.dept-icon { color: #3498db; }
+    .dept-education:hover { border-top: 4px solid #3498db; }
+
+    .dept-electricity i.dept-icon { color: #f39c12; }
+    .dept-electricity:hover { border-top: 4px solid #f39c12; }
+
+    .dept-water i.dept-icon { color: #1abc9c; }
+    .dept-water:hover { border-top: 4px solid #1abc9c; }
+
+    .dept-healthcare i.dept-icon { color: #e91e63; }
+    .dept-healthcare:hover { border-top: 4px solid #e91e63; }
+
+    .dept-municipal i.dept-icon { color: #9b59b6; }
+    .dept-municipal:hover { border-top: 4px solid #9b59b6; }
+
+    .dept-safety i.dept-icon { color: #c0392b; }
+    .dept-safety:hover { border-top: 4px solid #c0392b; }
+
+    .dept-transport i.dept-icon { color: #16a085; }
+    .dept-transport:hover { border-top: 4px solid #16a085; }
+
+    .dept-general i.dept-icon { color: #7f8c8d; }
+    .dept-general:hover { border-top: 4px solid #7f8c8d; }
+
+    .logout-btn {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+    }
+
+    .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(231, 76, 60, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .portal-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .departments-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .department-card {
+            padding: 20px;
+            min-height: 180px;
+        }
+
+        .department-card i.dept-icon {
+            font-size: 2.5rem;
+        }
+
+        .department-card .dept-name {
+            font-size: 1rem;
+        }
+
+        .department-card .dept-subtitle {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="portal-section">
+    <div class="container">
+        <div class="portal-header">
+            <h1>
+                <i class="fas fa-building me-3"></i>
+                Department Portal
+            </h1>
+            <p>Select your department to manage complaints</p>
+        </div>
+
+        <div class="departments-grid">
+            {% for dept in departments %}
+                {% if dept.slug %}
+                    {% if dept.slug == 'corruption-bribery' or dept.category == 'corruption' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-corruption" style="order: 1;">
+                        <i class="fas fa-gavel dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Anti-corruption complaints</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'education' or dept.category == 'education' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-education" style="order: 2;">
+                        <i class="fas fa-book dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Schools, colleges, education</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'electricity' or dept.category == 'electricity' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-electricity" style="order: 3;">
+                        <i class="fas fa-bolt dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Power supply, outages, billing</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'water-supply' or dept.category == 'water' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-water" style="order: 4;">
+                        <i class="fas fa-tint dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Water quality, supply issues</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'healthcare' or dept.category == 'healthcare' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-healthcare" style="order: 5;">
+                        <i class="fas fa-hospital dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Hospitals, clinics, services</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'municipal-issues' or dept.category == 'municipal' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-municipal" style="order: 6;">
+                        <i class="fas fa-city dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Roads, sanitation, waste</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'public-safety' or dept.category == 'safety' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-safety" style="order: 7;">
+                        <i class="fas fa-shield-alt dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Police, fire, emergency</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'transport' or dept.category == 'transport' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-transport" style="order: 8;">
+                        <i class="fas fa-bus dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Public transport, roads</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% elif dept.slug == 'general-complaint' or dept.category == 'general' %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-general" style="order: 9;">
+                        <i class="fas fa-envelope-open dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-subtitle">Other government services</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'department_login' dept.slug %}" class="department-card dept-general" style="order: 9;">
+                        <i class="fas fa-building dept-icon"></i>
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <i class="fas fa-arrow-right dept-arrow"></i>
+                    </a>
+                    {% endif %}
+                {% else %}
+                <div class="department-card">
+                    <i class="fas fa-building dept-icon"></i>
+                    <div class="dept-name">{{ dept.name }}</div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center;">
+            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

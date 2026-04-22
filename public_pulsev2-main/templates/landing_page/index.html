@@ -1,0 +1,2017 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Civic Pulse{% endblock %}
+
+{% block styles %}
+<style>
+/* Existing styles from your index.html - keep them */
+.header-logo {
+    text-align: center;
+    padding: 20px 0;
+}
+.header-logo .logo {
+    max-height: 80px;
+}
+.header-logo h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-top: 10px;
+}
+.header-logo h2 span {
+    color: #24CFED;
+}
+
+/* Hero Section - UPDATED WITH ROTATING QUOTES */
+.hero-section {
+    /* Pure image background */
+    background: url("{% static 'Images/government-building.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    border-radius: 10px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+}
+
+/* Add margin-top to the content to push it DOWN */
+.hero-content {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    background: rgba(100, 100, 100, 0.7);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* NEW: Rotating Quotes Container */
+.quotes-container {
+    height: 100px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.quote-item {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 10px;
+    font-style: italic;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.quote-item.active {
+    opacity: 1;
+}
+
+.quote-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 8px;
+}
+
+.quote-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.quote-dot.active {
+    background-color: white;
+}
+
+.hero-button {
+    display: inline-block;
+    padding: 12px 35px;
+    background-color: #24CFED;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+.hero-button:hover {
+    background-color: #1db7d8;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Optional: Add a subtle animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.hero-content {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Rest of your existing styles remain unchanged below */
+/* Navigation Styles */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.navbar-brand {
+    color: #24CFED !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+.nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    margin: 0 5px;
+}
+.nav-link:hover {
+    color: #24CFED !important;
+}
+.btn-register {
+    background: linear-gradient(45deg, #24CFED, #1db7d8);
+    color: white !important;
+    border-radius: 20px;
+    padding: 8px 20px !important;
+    margin-left: 10px;
+}
+.btn-register:hover {
+    background: linear-gradient(45deg, #1db7d8, #1699b7);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* About Section */
+.about-section {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+}
+.about {
+    align-items: center;
+}
+.content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+.content h2 span {
+    color: #24CFED;
+}
+.content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #666;
+}
+.image {
+    position: relative;
+}
+.aboutpic {
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.back-rectangle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #24CFED;
+    border-radius: 10px;
+    z-index: -1;
+    transform: translate(20px, 20px);
+}
+
+/* Features Section */
+.features-section {
+    padding: 80px 0;
+}
+.features-section h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+    color: #333;
+}
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+.feature1 {
+    flex: 1;
+    min-width: 300px;
+    max-width: 350px;
+    padding: 30px;
+    text-align: center;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+.feature1:hover {
+    transform: translateY(-10px);
+}
+.eclipse1 {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #24CFED 0%, #1db7d8 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.robot {
+    max-width: 60px;
+    max-height: 60px;
+}
+.feature1 h4 {
+    margin: 15px 0;
+    color: #333;
+    font-size: 1.3rem;
+}
+.feature1 p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+}
+.how-it-works h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+    color: #333;
+}
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+.carousel {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+.carousel .card {
+    flex: 0 0 100%;
+    padding: 40px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    text-align: center;
+}
+.carousel .card h4 {
+    color: #24CFED;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+.carousel .card p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+.carousel-prev, .carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #24CFED;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.carousel-prev:hover, .carousel-next:hover {
+    background: #1db7d8;
+}
+.carousel-prev {
+    left: 20px;
+}
+.carousel-next {
+    right: 20px;
+}
+
+/* Testimonials Section */
+.testimonials {
+    padding: 80px 0;
+}
+.testimonials h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+    color: #333;
+}
+.card-container {
+    gap: 30px;
+}
+.testimonials .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+.testimonials .card:hover {
+    transform: translateY(-10px);
+}
+.card-header {
+    text-align: center;
+    background: transparent;
+    border: none;
+    padding: 30px 20px 20px;
+}
+.user-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #24CFED;
+}
+.card-header h4 {
+    color: #333;
+    margin-bottom: 5px;
+}
+.card-header h6 {
+    color: #666;
+    font-style: italic;
+}
+.card-body {
+    padding: 20px;
+}
+.card-body p {
+    color: #666;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Statistics Section */
+.statistics-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+.statistics-section h3 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.statistics-section p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+/* Call to Action */
+.cta-section {
+    background: linear-gradient(135deg, #24CFED 0%, #1db7d8 100%);
+    padding: 80px 0;
+    color: white;
+    text-align: center;
+}
+.cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+.btn-light {
+    background: white;
+    color: #24CFED !important;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+.btn-outline-light {
+    border: 2px solid white;
+    color: white !important;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+.btn-light:hover, .btn-outline-light:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Footer Section */
+.footer-end {
+    background: #2c3e50;
+    color: white;
+    padding: 60px 0 30px;
+    margin-top: 60px;
+    border-radius: 10px 10px 0 0;
+}
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+.footer-section h3 {
+    color: #24CFED;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+.footer-section p {
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+.social-icons a {
+    display: inline-block;
+    margin-right: 15px;
+    color: white;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+.social-icons a:hover {
+    opacity: 1;
+    color: #24CFED;
+}
+.copyright {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+}
+
+/* ===================== */
+/* CHATBOT STYLES - ADDED */
+/* ===================== */
+
+/* Floating Chatbot Button - UPDATED FOR LARGER SIZE */
+/* Floating Chatbot Button - EXTRA LARGE SIZE */
+/* Floating Chatbot Button - VERY LARGE SIZE */
+.chatbot-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: 5px solid white;
+    overflow: hidden;
+}
+
+.chatbot-floating-btn img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.chatbot-floating-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 20px 45px rgba(102, 126, 234, 0.6);
+}
+
+.chatbot-floating-btn:hover img {
+    transform: scale(1.15);
+}
+
+.chatbot-floating-btn.active {
+    transform: scale(1.15);
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.chatbot-floating-btn .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e74c3c;
+    color: white;
+    font-size: 0.9rem;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Update the responsive mobile version too */
+@media (max-width: 768px) {
+    /* ... other mobile styles ... */
+    
+    .chatbot-floating-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 90px;
+        height: 90px;
+        border-width: 3px;
+    }
+}
+
+/* Chatbot Widget */
+.chatbot-widget {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 380px;
+    height: 550px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.chatbot-widget.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Chatbot Header */
+.chatbot-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.chatbot-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chatbot-header-info {
+    flex: 1;
+}
+
+.chatbot-header-info h4 {
+    margin: 0 0 5px 0;
+    font-weight: 600;
+}
+
+.chatbot-header-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.chatbot-close:hover {
+    opacity: 1;
+}
+
+.chatbot-maximize {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-maximize:hover {
+    opacity: 1;
+}
+
+.chatbot-widget.chatbot-maximized {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 2000;
+    transform: none;
+}
+
+.chatbot-widget.chatbot-maximized .chatbot-body {
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .chatbot-widget.chatbot-maximized {
+        width: 100vw;
+        height: 100vh;
+        bottom: 0;
+        right: 0;
+        border-radius: 0;
+    }
+}
+
+/* Chatbot Body */
+.chatbot-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Welcome Message */
+.chat-welcome {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 10px;
+}
+
+.chat-welcome h5 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.chat-welcome p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Messages */
+.chat-message {
+    display: flex;
+    gap: 10px;
+    max-width: 85%;
+}
+
+.chat-message.bot {
+    align-self: flex-start;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-avatar {
+    background: #24CFED;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.message-content {
+    padding: 12px 16px;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.bot .message-content {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-top-left-radius: 5px;
+}
+
+.user .message-content {
+    background: #24CFED;
+    color: white;
+    border-top-right-radius: 5px;
+}
+
+.message-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* Quick Questions */
+.quick-questions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.quick-question {
+    background: #f1f3f9;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #333;
+}
+
+.quick-question:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+/* Chatbot Input */
+.chatbot-input {
+    padding: 15px 20px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 12px 20px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.chat-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.btn-send {
+    background: #24CFED;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.1rem;
+}
+
+.btn-send:hover {
+    background: #1db7d8;
+    transform: scale(1.05);
+}
+
+.btn-send:active {
+    transform: scale(0.95);
+}
+
+/* Microphone Button */
+.btn-mic {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.btn-mic:hover {
+    background: #5568d3;
+    transform: scale(1.05);
+}
+
+.btn-mic:active {
+    transform: scale(0.95);
+}
+
+.btn-mic.listening {
+    background: #ff4444;
+    animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
+    }
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 15px;
+    align-items: center;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #667eea;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .quote-item {
+        font-size: 1rem;
+    }
+    
+    .quotes-container {
+        height: 120px;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    .about {
+        flex-direction: column;
+    }
+    .content, .image {
+        width: 100% !important;
+        margin-bottom: 30px;
+    }
+    .features {
+        flex-direction: column;
+        align-items: center;
+    }
+    .feature1 {
+        width: 100%;
+        max-width: 100%;
+    }
+    .navbar-nav {
+        text-align: center;
+        padding: 10px 0;
+    }
+    .btn-register {
+        margin: 10px 0;
+    }
+    
+    /* Chatbot Responsive */
+    .chatbot-widget {
+        width: 90%;
+        right: 5%;
+        bottom: 80px;
+        height: 70vh;
+    }
+    
+    .chatbot-floating-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 65px;
+        height: 65px;
+    }
+}
+
+/* Notification Animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.chatbot-floating-btn.has-notification {
+    animation: pulse 1s infinite;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navigation is handled by base.html -->
+
+<!-- Hero Section - UPDATED WITH ROTATING QUOTES -->
+<section class="hero-section" id="home">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Civic Pulse</h1>
+            
+            <!-- Rotating Quotes Container -->
+            <div class="quotes-container">
+                <!-- Quote 1 -->
+                <div class="quote-item active">
+                    "Connecting citizens and governance through intelligent digital solutions."
+                </div>
+                <!-- Quote 2 -->
+                <div class="quote-item">
+                    "Transforming public feedback into actionable insights using AI."
+                </div>
+                <!-- Quote 3 -->
+                <div class="quote-item">
+                    "Helping communities report and resolve local civic challenges efficiently."
+                </div>
+                <!-- Quote 4 -->
+                <div class="quote-item">
+                    "Ensuring reliable power by enabling quick reporting of electrical issues."
+                </div>
+                <!-- Quote 5 -->
+                <div class="quote-item">
+                    "Supporting timely action on water-related concerns for healthier communities."
+                </div>
+                <!-- Quote 6 -->
+                <div class="quote-item">
+                    "Giving citizens a voice to improve access and quality of public healthcare services."
+                </div>
+                <!-- Quote 7 -->
+                <div class="quote-item">
+                    "Empowering students and citizens to report educational infrastructure and service issues."
+                </div>
+                <!-- Quote 8 -->
+                <div class="quote-item">
+                    "Making public transportation safer and more efficient through citizen feedback."
+                </div>
+                <!-- Quote 9 -->
+                <div class="quote-item">
+                    "Promoting transparency by enabling secure and responsible reporting of corruption."
+                </div>
+                <!-- Quote 10 -->
+                <div class="quote-item">
+                    "Strengthening public safety by allowing citizens to report concerns in real time."
+                </div>
+                <!-- Quote 11 -->
+                <div class="quote-item">
+                    "A simple and reliable way to share concerns that matter to everyday life."
+                </div>
+                
+                <!-- Dots for quotes -->
+                <div class="quote-dots">
+                    <span class="quote-dot active" data-index="0"></span>
+                    <span class="quote-dot" data-index="1"></span>
+                    <span class="quote-dot" data-index="2"></span>
+                    <span class="quote-dot" data-index="3"></span>
+                    <span class="quote-dot" data-index="4"></span>
+                    <span class="quote-dot" data-index="5"></span>
+                    <span class="quote-dot" data-index="6"></span>
+                    <span class="quote-dot" data-index="7"></span>
+                    <span class="quote-dot" data-index="8"></span>
+                    <span class="quote-dot" data-index="9"></span>
+                    <span class="quote-dot" data-index="10"></span>
+                </div>
+            </div>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="hero-button">
+                    <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="hero-button">
+                    <i class="fas fa-rocket me-2"></i> Get Started
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Rest of your existing HTML content remains exactly the same -->
+<!-- About Section -->
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="about row">
+            <div class="content col-md-6">
+                <h2><span>Ab</span>out Civic Pulse</h2>
+                <p>Civic Pulse is your one-stop online platform to connect with your government, have your say, and make a difference. We believe every citizen's voice deserves to be heard, and this AI-powered system makes it easier than ever to share your feedback and report issues.</p>
+                <div class="mt-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'lodge_complaint' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Lodge Complaint
+                        </a>
+                        <a href="{% url 'track_complaint' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-1"></i> Track Complaint
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-user-plus me-1"></i> Register Now
+                        </a>
+                        <a href="{% url 'how_it_works' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-info-circle me-1"></i> Learn More
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="image col-md-6 text-center">
+                <img class="aboutpic" src="{% static 'Images/handshaking.png' %}" alt="Handshaking">
+                <div class="back-rectangle"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <h2>AI-Powered Features</h2>
+        <p class="text-center text-muted mb-5">Advanced technology for better governance and citizen engagement</p>
+        <div class="features row">
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-robot fa-2x text-white"></i>
+                </div>
+                <h4>AI Categorization</h4>
+                <p>Automatic categorization using advanced AI algorithms for accurate routing of complaints to relevant departments.</p>
+            </div>
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-exclamation-triangle fa-2x text-white"></i>
+                </div>
+                <h4>Priority Detection</h4>
+                <p>AI detects urgency level for faster resolution of critical issues and emergency situations.</p>
+            </div>
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-smile fa-2x text-white"></i>
+                </div>
+                <h4>Sentiment Analysis</h4>
+                <p>Understand citizen emotions and satisfaction levels for better service delivery and response.</p>
+            </div>
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-bolt fa-2x text-white"></i>
+                </div>
+                <h4>Real-time Tracking</h4>
+                <p>Track your complaint status in real-time with detailed progress updates and notifications.</p>
+            </div>
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-chart-line fa-2x text-white"></i>
+                </div>
+                <h4>Data Analytics</h4>
+                <p>Comprehensive analytics and visualization of complaint trends and resolution patterns.</p>
+            </div>
+            <div class="feature1 col-lg-4 col-md-6">
+                <div class="eclipse1">
+                    <i class="fas fa-shield-alt fa-2x text-white"></i>
+                </div>
+                <h4>Secure Platform</h4>
+                <p>End-to-end encryption and secure data handling to protect your privacy and information.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="howitworks">
+    <div class="container">
+        <h2>How It Works</h2>
+        <p class="text-center text-muted mb-5">Simple 5-step process to get your issues resolved</p>
+        <div class="carousel-container">
+            <div class="carousel">
+                <div class="card">
+                    <h4>1. Register Account</h4>
+                    <p>Create your account in minutes. Just provide basic details and verify your email to get started.</p>
+                </div>
+                <div class="card">
+                    <h4>2. Lodge Complaint</h4>
+                    <p>Submit your complaint through our user-friendly form. Provide details about the issue, location, and any relevant information.</p>
+                </div>
+                <div class="card">
+                    <h4>3. AI Analysis</h4>
+                    <p>Our AI system automatically categorizes your complaint, detects priority level, and analyzes sentiment for better handling.</p>
+                </div>
+                <div class="card">
+                    <h4>4. Track Progress</h4>
+                    <p>Track your complaint status in real-time. Receive updates at every stage of the resolution process via email and dashboard.</p>
+                </div>
+                <div class="card">
+                    <h4>5. Resolution & Feedback</h4>
+                    <p>Get notified when your complaint is resolved. Provide feedback to help us improve our services.</p>
+                </div>
+            </div>
+            <button class="carousel-prev">&lt;</button>
+            <button class="carousel-next">&gt;</button>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'how_it_works' %}" class="btn btn-outline-primary">
+                <i class="fas fa-book me-2"></i> Detailed Guide
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="statistics-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <h3 class="text-primary display-4">{{ total_complaints|default:"1500" }}+</h3>
+                <p class="text-muted">Complaints Resolved</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h3 class="text-success display-4">24/7</h3>
+                <p class="text-muted">Support Available</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h3 class="text-warning display-4">94%</h3>
+                <p class="text-muted">Satisfaction Rate</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h3 class="text-info display-4">{{ resolved_complaints|default:"1200" }}+</h3>
+                <p class="text-muted">Happy Citizens</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials" id="testimonials">
+    <div class="container">
+        <h2>What Citizens Say</h2>
+        <p class="text-center text-muted mb-5">Hear from our satisfied users</p>
+        <div class="card-container row">
+            <div class="card col-md-4">
+                <div class="card-header">
+                    <img class="user-img" src="{% static 'Images/user1.jpg' %}" alt="Narendra Modi" onerror="this.src='https://ui-avatars.com/api/?name=Narendra+Modi&background=24CFED&color=fff&size=110'">
+                    <h4>Narendra Modi</h4>
+                    <h6>Nakuru Resident</h6>
+                </div>
+                <div class="card-body">
+                    <p>"Civic Pulse provides an effective digital platform for addressing public concerns in a structured and transparent manner. The system enables timely responses and ensures that citizen queries are handled with clarity and accountability. It reflects the importance of technology-driven governance."</p>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <div class="card-header">
+                    <img class="user-img" src="{% static 'Images/user2.jpg' %}" alt="Revanth Reddy" onerror="this.src='https://ui-avatars.com/api/?name=Revanth+Reddy&background=24CFED&color=fff&size=110'">
+                    <h4>Revanth Reddy</h4>
+                    <h6>Government Official</h6>
+                </div>
+                <div class="card-body">
+                    <p>"The adoption of Civic Pulse has enhanced the efficiency of citizen–government interaction. Its real-time tracking and analytical capabilities support informed decision-making and faster grievance resolution. The platform contributes positively to modern administrative processes."</p>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <div class="card-header">
+                    <img class="user-img" src="{% static 'Images/user3.jpg' %}" alt="Malla Reddy" onerror="this.src='https://ui-avatars.com/api/?name=Malla+Reddy&background=24CFED&color=fff&size=110'">
+                    <h4>Malla Reddy</h4>
+                    <h6>Small Business Owner</h6>
+                </div>
+                <div class="card-body">
+                    <p>"Civic Pulse simplifies communication with government authorities by providing a reliable and organized reporting mechanism. The acknowledgment system and status updates reduce delays and improve confidence in public service delivery. It is a valuable tool for citizens and businesses alike."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Make Your Voice Heard?</h2>
+        <p class="lead">Join thousands of citizens who are using Civic Pulse to improve government services and make their communities better.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i> Create Free Account
+                </a>
+            {% endif %}
+            <a href="{% url 'lodge_complaint' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-edit me-2"></i> Lodge a Complaint
+            </a>
+            <a href="{% url 'how_it_works' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-play-circle me-2"></i> See How It Works
+            </a>
+        </div>
+        <p class="mt-4 small">No credit card required. Start in seconds.</p>
+    </div>
+</section>
+
+<!-- Floating Chatbot Button - UPDATED WITH robot.jpg -->
+<div class="chatbot-floating-btn" id="chatbotToggle">
+    <!-- robot.jpg visible on floating button -->
+    <img src="{% static 'Images/robot.jpg' %}" alt="Chatbot" onerror="this.innerHTML='🤖'">
+    <span class="badge" id="chatNotification" style="display: none;">1</span>
+</div>
+
+<!-- Chatbot Widget -->
+<div class="chatbot-widget" id="chatbotWidget">
+    <!-- Header -->
+    <div class="chatbot-header">
+        <div class="chatbot-avatar">
+            <!-- robot.jpg inside the chat widget too -->
+            <img src="{% static 'Images/robot.jpg' %}" alt="AI Assistant" onerror="this.innerHTML='🤖'">
+        </div>
+        <div class="chatbot-header-info">
+            <h4>Civic Pulse AI</h4>
+            <p><i class="fas fa-circle" style="color: #27ae60; font-size: 0.7rem;"></i> Ready to help you</p>
+        </div>
+        <button class="chatbot-maximize" id="chatbotMaximize" aria-label="Maximize chatbot">
+            <i class="fas fa-expand"></i>
+        </button>
+        <button class="chatbot-close" id="chatbotClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- Chat Body -->
+    <div class="chatbot-body" id="chatbotBody">
+        <!-- Welcome Message -->
+        <div class="chat-welcome">
+            <h5><i class="fas fa-robot me-2"></i>Hello! I'm Civic Pulse AI</h5>
+            <p>I can help you understand how our platform works, guide you through registration, or answer questions about citizen-government interactions.</p>
+        </div>
+        
+        <!-- Bot's First Message -->
+        <div class="chat-message bot">
+            <div class="message-avatar">
+                <!-- robot.jpg for all bot messages -->
+                <img src="{% static 'Images/robot.jpg' %}" alt="AI Assistant" onerror="this.innerHTML='🤖'">
+            </div>
+            <div class="message-content">
+                <p class="message-text">Hi there! 👋 Welcome to Civic Pulse. How can I assist you today?</p>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+        
+        <!-- Quick Questions -->
+        <div class="quick-questions">
+            <div class="quick-question" data-question="How does Civic Pulse work?">
+                How does Civic Pulse work?
+            </div>
+            <div class="quick-question" data-question="How do I register?">
+                How do I register?
+            </div>
+            <div class="quick-question" data-question="What can I complain about?">
+                What can I complain about?
+            </div>
+            <div class="quick-question" data-question="Is my data secure?">
+                Is my data secure?
+            </div>
+        </div>
+    </div>
+    
+    <!-- Input Area -->
+    <div class="chatbot-input">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message here..." maxlength="500">
+        <button class="btn-mic" id="micButton" type="button" title="Click to start voice input" aria-label="Microphone input">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button class="btn-send" id="sendMessage">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ============ ROTATING QUOTES FUNCTIONALITY ============
+document.addEventListener('DOMContentLoaded', function() {
+    // Quotes rotation functionality
+    const quotes = document.querySelectorAll('.quote-item');
+    const dots = document.querySelectorAll('.quote-dot');
+    let currentQuoteIndex = 0;
+    let quoteInterval;
+    
+    // Function to show a specific quote
+    function showQuote(index) {
+        // Hide all quotes
+        quotes.forEach(quote => quote.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Show the selected quote and dot
+        quotes[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentQuoteIndex = index;
+    }
+    
+    // Function to show next quote
+    function showNextQuote() {
+        let nextIndex = (currentQuoteIndex + 1) % quotes.length;
+        showQuote(nextIndex);
+    }
+    
+    // Start automatic rotation (every 4 seconds)
+    function startQuoteRotation() {
+        clearInterval(quoteInterval);
+        quoteInterval = setInterval(showNextQuote, 4000);
+    }
+    
+    // Event listeners for dots
+    dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            showQuote(index);
+            startQuoteRotation(); // Restart rotation after manual click
+        });
+    });
+    
+    // Pause rotation on hover
+    const quotesContainer = document.querySelector('.quotes-container');
+    quotesContainer.addEventListener('mouseenter', function() {
+        clearInterval(quoteInterval);
+    });
+    
+    quotesContainer.addEventListener('mouseleave', function() {
+        startQuoteRotation();
+    });
+    
+    // Start the rotation
+    startQuoteRotation();
+});
+
+// ============ EXISTING CAROUSEL FUNCTIONALITY ============
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('.carousel');
+    const prevBtn = document.querySelector('.carousel-prev');
+    const nextBtn = document.querySelector('.carousel-next');
+    const cards = document.querySelectorAll('.carousel .card');
+    
+    if (!carousel || !prevBtn || !nextBtn || cards.length === 0) return;
+    
+    let currentIndex = 0;
+    const totalCards = cards.length;
+    
+    // Auto slide every 5 seconds
+    let autoSlide = setInterval(() => {
+        currentIndex = (currentIndex + 1) % totalCards;
+        updateCarousel();
+    }, 5000);
+    
+    nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % totalCards;
+        updateCarousel();
+        resetAutoSlide();
+    });
+    
+    prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+        updateCarousel();
+        resetAutoSlide();
+    });
+    
+    function updateCarousel() {
+        const translateValue = -currentIndex * 100 + '%';
+        carousel.style.transform = 'translateX(' + translateValue + ')';
+        
+        // Update active indicator
+        if (document.querySelectorAll('.carousel-indicator').length > 0) {
+            document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+                indicator.style.background = index === currentIndex ? '#24CFED' : '#ccc';
+            });
+        }
+    }
+    
+    function resetAutoSlide() {
+        clearInterval(autoSlide);
+        autoSlide = setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalCards;
+            updateCarousel();
+        }, 5000);
+    }
+    
+    // Create indicators if they don't exist
+    if (!document.querySelector('.carousel-indicators')) {
+        const indicatorContainer = document.createElement('div');
+        indicatorContainer.className = 'carousel-indicators d-flex justify-content-center mt-4';
+        
+        for (let i = 0; i < totalCards; i++) {
+            const indicator = document.createElement('button');
+            indicator.className = 'carousel-indicator mx-1';
+            indicator.innerHTML = '●';
+            indicator.style.cssText = 'border: none; background: #ccc; color: #ccc; width: 12px; height: 12px; border-radius: 50%; padding: 0; font-size: 10px; cursor: pointer; transition: background 0.3s;';
+            indicator.addEventListener('click', () => {
+                currentIndex = i;
+                updateCarousel();
+                resetAutoSlide();
+            });
+            indicatorContainer.appendChild(indicator);
+        }
+        
+        carousel.parentNode.appendChild(indicatorContainer);
+    }
+    
+    updateCarousel();
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+// ============ EXISTING CHATBOT FUNCTIONALITY ============
+document.addEventListener('DOMContentLoaded', function() {
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotWidget = document.getElementById('chatbotWidget');
+    const chatbotClose = document.getElementById('chatbotClose');
+    const chatInput = document.getElementById('chatInput');
+    const sendMessage = document.getElementById('sendMessage');
+    const chatbotBody = document.getElementById('chatbotBody');
+    const quickQuestions = document.querySelectorAll('.quick-question');
+    const chatNotification = document.getElementById('chatNotification');
+    
+    let isFirstInteraction = true;
+    
+    // Toggle chatbot
+    chatbotToggle.addEventListener('click', function() {
+        chatbotWidget.classList.toggle('active');
+        chatbotToggle.classList.toggle('active');
+        chatInput.focus();
+        
+        // Hide notification when opened
+        chatNotification.style.display = 'none';
+        chatbotToggle.classList.remove('has-notification');
+    });
+    
+    // Close chatbot
+    chatbotClose.addEventListener('click', function() {
+        chatbotWidget.classList.remove('active');
+        chatbotToggle.classList.remove('active');
+    });
+
+    // Maximize / restore chatbot
+    const chatbotMaximize = document.getElementById('chatbotMaximize');
+    chatbotMaximize.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        const isMaximized = chatbotWidget.classList.toggle('chatbot-maximized');
+
+        if (isMaximized) {
+            icon.classList.remove('fa-expand');
+            icon.classList.add('fa-compress');
+        } else {
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
+        }
+    });
+
+    // ============ WEB SPEECH API FOR VOICE INPUT ============
+    const micButton = document.getElementById('micButton');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    console.log('🎤 Initializing Web Speech API...');
+    console.log('SpeechRecognition available:', !!SpeechRecognition);
+
+    if (!SpeechRecognition) {
+        console.error('Speech Recognition not supported in this browser');
+        micButton.disabled = true;
+        micButton.title = 'Speech Recognition not supported in this browser';
+        micButton.style.opacity = '0.5';
+        micButton.style.cursor = 'not-allowed';
+    } else {
+        try {
+            recognition = new SpeechRecognition();
+            console.log('✅ Recognition object created');
+            
+            // Configuration
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            console.log('✅ Recognition configured: continuous=false, interimResults=false, lang=en-US');
+
+            // Event: Voice started
+            recognition.onstart = function() {
+                console.log('🎤 Voice recognition started');
+                isListening = true;
+                micButton.classList.add('listening');
+                micButton.title = 'Listening... Click to stop';
+                micButton.innerHTML = '<i class="fas fa-circle"></i>';
+                console.log('✅ UI updated: button is now in listening state');
+            };
+
+            // Event: Result received
+            recognition.onresult = function(event) {
+                console.log('📝 Recognition result received');
+                console.log('Result event:', event);
+                
+                let transcript = '';
+                let isFinal = false;
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcriptSegment = event.results[i][0].transcript;
+                    console.log(`  Result ${i}: "${transcriptSegment}" (final: ${event.results[i].isFinal})`);
+                    
+                    transcript += transcriptSegment + ' ';
+                    if (event.results[i].isFinal) {
+                        isFinal = true;
+                    }
+                }
+
+                transcript = transcript.trim();
+                console.log('📢 Final transcript:', transcript);
+                
+                if (transcript) {
+                    chatInput.value = transcript;
+                    console.log('✅ Input field filled with:', transcript);
+                    
+                    // Automatically send message
+                    if (isFinal) {
+                        console.log('⏳ Triggering sendMessage click...');
+                        sendMessage.click();
+                        console.log('✅ Message sent');
+                    }
+                } else {
+                    console.warn('⚠️ Transcript is empty');
+                }
+            };
+
+            // Event: Error occurred
+            recognition.onerror = function(event) {
+                console.error('❌ Speech Recognition Error:', event.error);
+                
+                let errorMsg = '';
+                switch(event.error) {
+                    case 'no-speech':
+                        errorMsg = 'No speech detected. Please speak clearly and try again.';
+                        console.warn('⚠️ No speech detected');
+                        break;
+                    case 'audio-capture':
+                        errorMsg = 'No microphone found. Please check your device.';
+                        console.error('❌ Audio capture device not found');
+                        break;
+                    case 'permission-denied':
+                        errorMsg = 'Microphone permission denied. Please enable microphone access in browser settings.';
+                        console.error('❌ Microphone permission denied');
+                        break;
+                    case 'network':
+                        errorMsg = 'Network error. Please check your internet connection.';
+                        console.error('❌ Network error during recognition');
+                        break;
+                    case 'not-allowed':
+                        errorMsg = 'Speech recognition not allowed. Please grant microphone permission.';
+                        console.error('❌ Speech recognition not allowed');
+                        break;
+                    default:
+                        errorMsg = `Error: ${event.error}`;
+                        console.error('❌ Unknown error:', event.error);
+                }
+                
+                console.error('❌ Error message:', errorMsg);
+                if (errorMsg) {
+                    console.warn('⚠️ User notification:', errorMsg);
+                }
+            };
+
+            // Event: Recognition ended
+            recognition.onend = function() {
+                console.log('🛑 Voice recognition ended');
+                isListening = false;
+                micButton.classList.remove('listening');
+                micButton.title = 'Click to start voice input';
+                micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                console.log('✅ UI reset: button returned to normal state');
+            };
+
+            // Click handler for mic button
+            micButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🖱️ Mic button clicked (currently listening:', isListening + ')');
+                
+                if (isListening) {
+                    console.log('⏹️ Stopping recognition...');
+                    try {
+                        recognition.stop();
+                        console.log('✅ Recognition stop() called');
+                    } catch (err) {
+                        console.error('❌ Error stopping recognition:', err);
+                    }
+                } else {
+                    console.log('▶️ Starting recognition...');
+                    chatInput.focus();
+                    try {
+                        recognition.start();
+                        console.log('✅ Recognition start() called');
+                    } catch (err) {
+                        console.error('❌ Error starting recognition:', err);
+                    }
+                }
+            });
+
+            console.log('✅ Web Speech API fully initialized and ready');
+
+        } catch (err) {
+            console.error('❌ Failed to initialize Speech Recognition:', err);
+            micButton.disabled = true;
+            micButton.title = 'Speech Recognition initialization failed';
+            micButton.style.opacity = '0.5';
+            micButton.style.cursor = 'not-allowed';
+        }
+    }
+    
+    // Send message on button click
+    sendMessage.addEventListener('click', sendUserMessage);
+    
+    // Send message on Enter key
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+            sendUserMessage();
+        }
+    });
+    
+    // Quick question buttons
+    quickQuestions.forEach(button => {
+        button.addEventListener('click', function() {
+            const question = this.getAttribute('data-question');
+            chatInput.value = question;
+            sendUserMessage();
+        });
+    });
+    
+    function sendUserMessage() {
+    const message = chatInput.value.trim();
+    if (message === '') return;
+    
+    // Add user message
+    addMessage(message, 'user');
+    chatInput.value = '';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Get bot response DIRECTLY
+    setTimeout(() => {
+        removeTypingIndicator();
+        const botResponse = getBotResponse(message);
+        addMessage(botResponse, 'bot');
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        
+        if (isFirstInteraction && !chatbotWidget.classList.contains('active')) {
+            chatNotification.style.display = 'flex';
+            chatbotToggle.classList.add('has-notification');
+            isFirstInteraction = false;
+        }
+    }, 600);
+
+
+}
+    
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}`;
+        
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        if (sender === 'bot') {
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <!-- robot.jpg for all bot messages -->
+                    <img src="{% static 'Images/robot.jpg' %}" alt="AI Assistant" onerror="this.innerHTML='🤖'">
+                </div>
+                <div class="message-content">
+                    <p class="message-text">${text}</p>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-avatar user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="message-content">
+                    <p class="message-text">${text}</p>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+        }
+        
+        chatbotBody.appendChild(messageDiv);
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="message-avatar">
+                <!-- robot.jpg for typing indicator too -->
+                <img src="{% static 'Images/robot.jpg' %}" alt="AI Assistant" onerror="this.innerHTML='🤖'">
+            </div>
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        `;
+        chatbotBody.appendChild(typingDiv);
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+    
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    // Simple bot responses (will be replaced with AI model later)
+    function getBotResponse(userMessage) {
+    const msg = userMessage.toLowerCase().trim();
+    
+    // ========== GREETINGS & SMALL TALK ==========
+    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg === 'hii' || msg === 'hiiii') {
+        return "👋 Hello! Welcome to Civic Pulse!\n\nI'm your AI Assistant, here to help you with everything about our platform.\n\n💬 You can ask me about:\n• 📝 Registration & Login\n• 📋 Submitting complaints\n• 🔍 Tracking complaints\n• 🏛️ Government departments\n• 🔒 Data security\n• 💰 Pricing (it's free!)\n\nHow can I help you today? 🌟";
+    }
+    
+    if (msg.includes('how are you') || msg.includes('how are u')) {
+        return "😊 I'm doing great, thank you for asking! I'm fully operational and ready to help you with any questions about Civic Pulse. What can I assist you with today?";
+    }
+    
+    if (msg.includes('thank') || msg.includes('thanks') || msg.includes('thx')) {
+        return "😊 You're very welcome! I'm glad I could help.\n\nRemember: You can register for free and start lodging complaints in less than 2 minutes!\n\nIs there anything else I can help you with? 🌟";
+    }
+    
+    if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you')) {
+        return "👋 Goodbye! Thanks for visiting Civic Pulse.\n\n📌 Quick reminder:\n• Registration is FREE\n• Keep your Complaint ID safe\n• Check email for updates\n\nCome back anytime! Have a great day! 🌟";
+    }
+    
+    // ========== TRUST & CREDIBILITY ==========
+    if (msg.includes('trust') || msg.includes('trusted') || msg.includes('legit') || msg.includes('real') || msg.includes('genuine') || msg.includes('authentic')) {
+        return "✅ Yes, Civic Pulse is a trusted and legitimate platform!\n\n🔐 Why you can trust us:\n• Government-backed initiative\n• Secure HTTPS encryption\n• Your data is never sold\n• Real-time complaint tracking\n• Official department integration\n• 1000+ complaints resolved successfully\n\nWe are committed to transparent and accountable governance through technology.";
+    }
+    
+    if (msg.includes('who handle') || msg.includes('who handles') || msg.includes('responsible')) {
+        return "🏛️ Who handles your complaint?\n\nYour complaint is handled by the relevant government department based on the category you select:\n\n• Education → Education Department\n• Healthcare → Health Department\n• Water → Water Supply Department\n• Electricity → Power Department\n• Roads/Transport → Transport Department\n• Garbage/Municipal → Municipal Corporation\n• Safety/Police → Police Department\n• Corruption → Anti-Corruption Bureau\n\nEach complaint is assigned to officials who specialize in that area for faster resolution.";
+    }
+    
+    // ========== LOGIN & REGISTRATION ==========
+    if (msg.includes('how do i login') || msg.includes('how to login') || msg.includes('login help') || msg.includes('sign in')) {
+        return "🔑 **Login Instructions**\n\n1️⃣ Go to Homepage\n2️⃣ Click 'Login' button (top right)\n3️⃣ Enter Username OR Email\n4️⃣ Enter Password\n5️⃣ Click 'Sign In'\n\n**Having trouble?**\n• Use 'Forgot Password' to reset\n• Check Caps Lock is OFF\n• Passwords are case-sensitive\n\nAfter login, you'll see your Dashboard where you can lodge complaints!\n\n❌ Don't have an account? Type 'How to register' to create one for FREE!";
+    }
+    
+    if (msg.includes('how to register') || msg.includes('how do i register') || msg.includes('sign up') || msg.includes('create account')) {
+        return "📝 **How to Register**\n\n1️⃣ Click 'Register' on homepage\n2️⃣ Enter Username (unique name)\n3️⃣ Enter Email (for notifications)\n4️⃣ Create Password (min 8 characters)\n5️⃣ Confirm Password\n6️⃣ Click 'Register'\n\n✅ After registration:\n• You're automatically logged in\n• Check email for confirmation\n• Start lodging complaints immediately\n\n**Requirements:**\n• Must be 18+ years\n• Valid email address\n• Phone number optional\n\n⏱️ Time: Less than 2 minutes!\n💰 Cost: Completely FREE!";
+    }
+    
+    if (msg.includes('forgot password') || msg.includes('reset password') || msg.includes('i forgot my password')) {
+        return "🔐 **Forgot Password - Reset Process**\n\n1️⃣ Go to Login Page\n2️⃣ Click 'Forgot Password?' link\n3️⃣ Enter your registered email address\n4️⃣ Click 'Send Reset Link'\n5️⃣ Check your email (including spam folder)\n6️⃣ Click the reset link (valid for 15 minutes)\n7️⃣ Enter new password (min 8 characters)\n8️⃣ Confirm new password\n9️⃣ Click 'Reset Password'\n🔟 Login with new password\n\n**Password Tips:**\n• Use mix of letters, numbers, symbols\n• Minimum 8 characters\n• Don't use personal information\n• Don't reuse old passwords\n\n❌ Still having issues? Contact support at civicpulse.govt@gmail.com";
+    }
+    
+    // ========== WHAT IS CIVIC PULSE ==========
+    if (msg.includes('what is civic pulse') || msg.includes('about civic pulse') || msg.includes('tell me about civic pulse')) {
+        return "🌟 **Civic Pulse - Smart Civic Engagement Platform**\n\nCivic Pulse is an AI-powered digital platform that helps citizens submit complaints and feedback to government departments.\n\n**Core Features:**\n🤖 AI-powered complaint categorization\n😊 Real-time sentiment analysis\n🔍 Unique complaint tracking ID\n📧 Instant email notifications\n👥 Three-tier system (Citizen, Admin, Department)\n💬 24/7 AI chatbot assistant\n\n**Mission:** Bridge the gap between citizens and government through transparent, efficient, and technology-driven complaint resolution.\n\n**Impact:** Faster resolution times, better accountability, and improved public services for all citizens!\n\n💰 **It's completely FREE for all citizens!**";
+    }
+    
+    // ========== HOW IT WORKS ==========
+    if (msg.includes('how it works') || msg.includes('how does civic pulse work') || msg.includes('how does it work')) {
+        return "⚙️ **How Civic Pulse Works - 6 Simple Steps**\n\n**Step 1: Register/Login** 📝\nCreate your free account with email and password (takes 2 minutes)\n\n**Step 2: Submit Complaint** 📋\n• Select category (Education, Healthcare, Water, etc.)\n• Describe your issue with location\n• Upload supporting images (optional)\n• AI analyzes in real-time\n\n**Step 3: AI Processing** 🤖\n• Auto-categorizes complaint\n• Detects sentiment (positive/negative/neutral)\n• Assigns priority (High/Medium/Low)\n• 89.2% accuracy rate\n\n**Step 4: Get Complaint ID** 🆔\n• Unique ID sent to your email instantly\n• Format: CP-XXXYYYYYY (e.g., CP-UNC60906)\n• Use ID for tracking\n\n**Step 5: Department Action** 🏛️\n• Complaint routed to relevant department\n• Status updates: Submitted → In Progress → Resolved\n• Email notifications for each update\n\n**Step 6: Track & Feedback** 📊\n• Track anytime using Complaint ID\n• Provide feedback after resolution\n\n**Total time:** Registration <2 min | Complaint submission <3 min | Tracking instant!";
+    }
+    
+    // ========== SUBMIT COMPLAINT ==========
+    if (msg.includes('how to submit complaint') || msg.includes('how to lodge') || msg.includes('lodge complaint') || msg.includes('file complaint') || msg.includes('how can i lodge')) {
+        return "📋 **How to Lodge a Complaint - Complete Guide**\n\n**Step-by-Step Process:**\n\n1️⃣ **Login** to your account\n2️⃣ Go to **Dashboard**\n3️⃣ Click **'Lodge a Complaint'** button\n\n**4️⃣ Fill the form:**\n• Select Category (Education, Healthcare, Water, Electricity, etc.)\n• Write detailed description:\n  - Exact location with landmarks\n  - Date and time of occurrence\n  - What happened clearly\n  - Any previous attempts to resolve\n  - Expected resolution\n• Add city/location\n• Upload photos (optional but recommended)\n\n5️⃣ Click **'Submit'**\n6️⃣ Receive unique **Complaint ID** via email instantly\n\n**Tips for Better Resolution:**\n• Be specific about location\n• Add photos for evidence\n• Describe impact clearly\n• Keep your Complaint ID safe\n\n**Total time:** Less than 3 minutes!";
+    }
+    
+    // ========== WHAT CAN I COMPLAIN ABOUT / CATEGORIES ==========
+    if (msg.includes('what can i complain about') || msg.includes('categories') || msg.includes('what categories') || msg.includes('types of complaints') || msg.includes('complaint categories')) {
+        return "📂 **What You Can Complain About - 9 Categories**\n\n**1. Education** 🏫\n• Schools, colleges, universities\n• Teacher conduct, absenteeism\n• Fee-related issues\n• Infrastructure problems\n\n**2. Healthcare** 🏥\n• Hospital services\n• Doctor/staff conduct\n• Medical negligence\n• Facility cleanliness\n\n**3. Transport** 🚌\n• Road conditions, potholes\n• Public transport issues\n• Traffic signal problems\n• Road safety concerns\n\n**4. Water Supply** 💧\n• Drinking water quality\n• Water shortage\n• Pipeline leaks\n• Water pressure issues\n\n**5. Electricity** ⚡\n• Power outages\n• Voltage fluctuations\n• Billing issues\n• Transformer problems\n\n**6. Municipal Issues** 🗑️\n• Garbage collection\n• Sanitation problems\n• Drainage issues\n• Street lighting\n\n**7. Public Safety** 🚔\n• Police response issues\n• Crime concerns\n• Street safety\n• Emergency response\n\n**8. Corruption & Bribery** 💰\n• Bribery demands\n• Official misconduct\n• Illegal payments\n• Fraudulent activities\n\n**9. General Complaint** 📝\n• Other government services\n• Miscellaneous issues\n\nYour complaint will be automatically routed to the right department!";
+    }
+    
+    // ========== WATER COMPLAINT ==========
+    if ((msg.includes('water') && (msg.includes('problem') || msg.includes('complaint') || msg.includes('issue'))) || msg.includes('no water') || msg.includes('water shortage')) {
+        return "💧 **How to File a Water Supply Complaint**\n\n**Step-by-Step Process:**\n\n1️⃣ **Login** to your Civic Pulse account\n2️⃣ Go to **'Lodge a Complaint'**\n3️⃣ Select Category: **'Water Supply'**\n\n**4️⃣ In description, include:**\n• Exact location (area, street, house number)\n• Duration of problem (how many days/weeks)\n• Type of issue:\n  - No water supply\n  - Low water pressure\n  - Pipeline leakage\n  - Dirty/contaminated water\n• Number of families affected\n• Any previous complaints filed\n\n5️⃣ Upload photos of the issue (recommended)\n6️⃣ Click **Submit**\n\n**Priority Level:**\n🔴 **High Priority** - No water for 3+ days, contamination (2-5 days)\n🟡 **Medium Priority** - Low pressure, irregular supply (5-10 days)\n🟢 **Low Priority** - Minor leakages, general complaints (10-15 days)\n\n**💡 Tip:** Be specific about your location and include photos for faster resolution!";
+    }
+    
+    // ========== ELECTRICITY COMPLAINT ==========
+    if (msg.includes('electricity') || msg.includes('power outage') || msg.includes('no power') || msg.includes('current problem')) {
+        return "⚡ **How to File an Electricity Complaint**\n\n**Step-by-Step Process:**\n\n1️⃣ **Login** to your account\n2️⃣ Go to **'Lodge a Complaint'**\n3️⃣ Select Category: **'Electricity'**\n\n**4️⃣ In description, include:**\n• Exact location\n• Duration of outage (how many hours/days)\n• Type of issue:\n  - Complete power outage\n  - Voltage fluctuations\n  - Billing issues\n  - Transformer problem\n  - Street light failure\n• Affected area (single house or whole area)\n\n5️⃣ Upload photos (if applicable)\n6️⃣ Click **Submit**\n\n**Priority Level:**\n🔴 **High Priority** - Complete outage over 12 hours (2-5 days)\n🟡 **Medium Priority** - Fluctuations, partial outage (5-10 days)\n🟢 **Low Priority** - Billing issues, street lights (10-15 days)\n\n**💡 Tip:** Mention your electricity bill account number for faster billing issue resolution!";
+    }
+    
+    // ========== ROAD / POTHOLES ==========
+    if (msg.includes('road') || msg.includes('pothole') || msg.includes('potholes') || msg.includes('transport')) {
+        return "🛣️ **How to File a Road/Pothole Complaint**\n\n**Step-by-Step Process:**\n\n1️⃣ **Login** to your account\n2️⃣ Go to **'Lodge a Complaint'**\n3️⃣ Select Category: **'Transport'**\n\n**4️⃣ In description, include:**\n• Exact location (road name, landmark, area)\n• Pothole size (approximate dimensions)\n• How long the issue exists\n• Number of potholes\n• Any accidents caused\n\n5️⃣ Upload photos showing the problem\n6️⃣ Click **Submit**\n\n**Priority Level:**\n🔴 **High Priority** - Major road damage, accident risk (2-5 days)\n🟡 **Medium Priority** - Multiple potholes (5-10 days)\n🟢 **Low Priority** - Minor cracks (10-15 days)\n\n**📸 Photos help authorities take faster action!**";
+    }
+    
+    // ========== TRACK COMPLAINT ==========
+    if (msg.includes('track complaint') || msg.includes('how to track') || msg.includes('check status') || msg.includes('track my complaint') || msg.includes('complaint status')) {
+        return "🔍 **How to Track Your Complaint**\n\n**Three Easy Ways:**\n\n**Method 1: Using Complaint ID** 🆔\n• Go to 'Track Complaint' page\n• Enter your Complaint ID (format: CP-XXXYYYYYY)\n• Click 'Track Now'\n• View complete status and timeline\n\n**Method 2: From Dashboard** 📊\n• Login to your account\n• Go to 'My Complaints' section\n• Click on any complaint to see details\n• Status displayed prominently\n\n**Method 3: Ask Chatbot** 💬\nSimply type: \"Check CP-UNC60906\"\nI'll show you the current status instantly!\n\n**What You'll See:**\n📝 **Current Status** - Submitted/In Progress/Resolved/Closed\n📅 **Submission Date** - When complaint was filed\n📍 **Location** - Where issue was reported\n🏛️ **Department** - Who is handling it\n📊 **Priority** - High/Medium/Low\n\n**Status Meanings:**\n• **Submitted** - Received, in queue (1-2 days)\n• **In Progress** - Being worked on (5-15 days)\n• **Resolved** - Issue addressed\n• **Closed** - Completed\n\nYou'll get email updates for every status change!";
+    }
+    
+    // ========== WHAT DOES PENDING MEAN ==========
+    if ((msg.includes('pending') && msg.includes('mean')) || msg.includes('what does pending') || msg.includes('why is my complaint pending')) {
+        return "📊 **What Does 'Pending' Mean?**\n\n'Pending' means your complaint is waiting for department action.\n\n**Status possibilities:**\n• **Submitted** - Received, in queue for review (1-2 days)\n• **In Progress** - Department is working on it (5-15 days)\n\n**Resolution timeframes:**\n🔴 **High Priority** - 2-5 days\n🟡 **Medium Priority** - 5-15 days\n🟢 **Low Priority** - 15-30 days\n\n**You'll receive email updates when:**\n✓ Complaint is assigned to department\n✓ Status changes\n✓ Issue is resolved\n\n**No action needed from you** - just wait for updates or track using your Complaint ID!\n\n⏰ If your complaint is pending for more than 15 days, contact support at civicpulse.govt@gmail.com";
+    }
+    
+    // ========== DEPARTMENTS AVAILABLE ==========
+    if (msg.includes('what departments') || msg.includes('departments available') || msg.includes('list of departments') || msg.includes('available departments') || msg.includes('which department')) {
+        return "🏛️ **Departments Available in Civic Pulse**\n\n**1. Education Department** 🏫\n• Schools, colleges, universities\n• Teacher conduct, fees, infrastructure\n\n**2. Healthcare Department** 🏥\n• Hospitals, clinics, medical services\n• Doctor conduct, facilities, negligence\n\n**3. Transport Department** 🚌\n• Roads, public transport, traffic\n• Potholes, signals, bus services\n\n**4. Water Supply Department** 💧\n• Water distribution, quality\n• Shortage, leaks, pressure issues\n\n**5. Electricity Department** ⚡\n• Power supply, billing\n• Outages, fluctuations, transformer issues\n\n**6. Municipal Corporation** 🗑️\n• Civic services, sanitation\n• Garbage, drainage, street lights, parks\n\n**7. Police Department** 🚔\n• Public safety, law enforcement\n• Safety concerns, police response, crime\n\n**8. Anti-Corruption Bureau** 💰\n• Corruption, bribery cases\n• Bribery demands, misconduct, fraud\n\n**9. General Administration** 📝\n• Other government services\n• Miscellaneous complaints\n\n**How to Choose:**\nSelect the department that best matches your issue. AI will also auto-detect and suggest the correct category!\n\n**💡 Tip:** Choosing the right department ensures your complaint reaches the right officials faster!";
+    }
+    
+    // ========== DETAILS REQUIRED ==========
+    if (msg.includes('what details are required') || msg.includes('required details') || msg.includes('details needed') || msg.includes('what information needed') || msg.includes('what do i need')) {
+        return "📝 **Required Details for Submitting a Complaint**\n\n**Mandatory Fields (Must Fill):**\n✅ **Category** - Select from 9 departments\n✅ **Description** - Detailed explanation of your issue\n✅ **City/District** - Where the problem is located\n\n**Optional but Recommended:**\n📸 **Images** - Upload photos as evidence (JPG, PNG, GIF, max 5MB)\n📍 **Full Address** - Street name, landmark, PIN code\n📞 **Phone Number** - For urgent contact if needed\n\n**What to Include in Description:**\n• Exact location with landmarks\n• When the problem started\n• How severe the issue is\n• How many people are affected\n• Any previous attempts to resolve\n• What resolution you expect\n\n**Example of Good Description:**\n'For the past 2 weeks, there is no water supply in Rajiv Nagar, Sector 12. We are 50+ families affected. The water pipeline on Main Road has been leaking since last month. We've called the municipal office 5 times but no action. Please fix immediately.'\n\n**💡 Tip:** The more details you provide, the faster your complaint gets resolved!";
+    }
+    
+    // ========== CAN I UPLOAD IMAGES ==========
+    if (msg.includes('upload images') || msg.includes('can i upload') || msg.includes('upload photo') || msg.includes('attach image') || msg.includes('photo evidence')) {
+        return "📸 **Yes, you can upload images with your complaint!**\n\n**How to Upload:**\n1️⃣ In the complaint form, click **'Choose File'** button\n2️⃣ Select image from your device\n3️⃣ Image appears as selected\n4️⃣ Submit complaint\n\n**Supported Formats:**\n✅ JPG / JPEG\n✅ PNG\n✅ GIF\n\n**File Size Limits:**\n📏 Maximum: **5MB per image**\n📏 If larger, compress before uploading\n\n**Tips for Good Photos:**\n• Take clear, well-lit photos\n• Capture the problem from multiple angles\n• Include landmarks for location reference\n• Show scale (use object for size reference)\n• Take close-ups for details\n\n**What to Photograph:**\n📸 Water leakage - Show source and damage\n📸 Potholes - Show depth and location\n📸 Garbage - Show extent and location\n📸 Road damage - Show area and surroundings\n\n**💡 Tip:** Photos help authorities understand the issue better and lead to faster resolution!";
+    }
+    
+    // ========== IS MY DATA SECURE ==========
+    if (msg.includes('is my data secure') || msg.includes('data secure') || msg.includes('privacy') || msg.includes('data safe') || msg.includes('secure')) {
+        return "🔒 **Yes, your data is completely secure!**\n\n**Security Measures:**\n\n**Password Security** 🔐\n• Passwords are hashed with PBKDF2\n• 100,000 iterations of SHA-256\n• Never stored in plain text\n• Salted to prevent attacks\n\n**Data Encryption** 🔒\n• HTTPS for all communications\n• SSL/TLS encryption\n• Secure data transmission\n• No man-in-the-middle attacks\n\n**Access Control** 👥\n• Role-Based Access Control (RBAC)\n• Citizens see only their complaints\n• Departments see only assigned complaints\n• Admins have full access (monitored)\n\n**What We DON'T Do:**\n❌ Sell your data to third parties\n❌ Share information without consent\n❌ Store sensitive information unnecessarily\n❌ Use data for marketing\n\n**Your Privacy Rights:**\n✅ You can view all your data\n✅ Request data deletion\n✅ Update profile information\n✅ Control notification preferences\n\n**💡 Remember:** Your data is safe with Civic Pulse!";
+    }
+    
+    // ========== IS IT FREE ==========
+    if (msg.includes('is it free') || msg.includes('free') || msg.includes('cost') || msg.includes('pay') || msg.includes('charges') || msg.includes('pricing') || msg.includes('money')) {
+        return "💰 **Completely FREE!**\n\n**Yes, Civic Pulse is 100% FREE for all citizens!**\n\n**No Hidden Costs:**\n✅ Free registration\n✅ Free complaint submission\n✅ Free tracking\n✅ Free email notifications\n✅ Free chatbot assistance\n✅ Free dashboard access\n\n**No Subscription Fees:**\n• No monthly charges\n• No annual fees\n• No premium tiers\n• No payment required\n\n**Who Pays?**\nThe platform is funded as a public service initiative to improve citizen-government interaction.\n\n**What's Free:**\n• Register account\n• Lodge complaints\n• Track status\n• Receive updates\n• Get AI analysis\n• Use chatbot\n• View analytics\n• All features\n\n**Forever Free:** Civic Pulse is committed to keeping services free for all citizens. We believe access to grievance redressal should never have a price tag!\n\n**Start using Civic Pulse today - no credit card, no payment, no catch!** 🌟";
+    }
+    
+    // ========== CONTACT SUPPORT ==========
+    if (msg.includes('contact support') || msg.includes('contact') || msg.includes('support') || msg.includes('help')) {
+        return "📞 **Contact Support**\n\n**Get Help When You Need It:**\n\n**Email Support** 📧\n• Address: civicpulse.govt@gmail.com\n• Response Time: 24-48 hours\n• Best for: Detailed queries, account issues\n\n**Chat Support** 💬\n• Use this chatbot!\n• Response: Instant\n• Best for: Quick questions, guidance\n\n**Contact Form** 📝\n• Location: Website footer\n• Response: 24-48 hours\n\n**What to Include in Your Message:**\n✅ Your username/email\n✅ Complaint ID (if applicable)\n✅ Detailed description of issue\n✅ Screenshots (if helpful)\n\n**Emergency Numbers:**\n🚨 Police: 100\n🚒 Fire: 101\n🚑 Ambulance: 102\n👩 Women Helpline: 1091\n👶 Child Helpline: 1098\n\n**Support Hours:**\n• Chat: 24/7 (AI assistant always available)\n• Email: Mon-Fri, 9 AM - 6 PM\n\n**We're Here to Help!** Don't hesitate to reach out with any questions or concerns.";
+    }
+    
+    // ========== WORKING HOURS ==========
+    if (msg.includes('working hours') || msg.includes('operating hours') || msg.includes('24/7') || msg.includes('available')) {
+        return "⏰ **Platform Availability**\n\n**Civic Pulse Platform:**\n✅ **24/7 - Always Open!**\n• Submit complaints anytime\n• Track status anytime\n• Use chatbot anytime\n• View dashboard anytime\n\n**Department Working Hours:**\n• Monday-Friday: 9:00 AM - 6:00 PM\n• Saturday: 9:00 AM - 2:00 PM\n• Sunday: Closed\n• Public Holidays: Closed\n\n**Support Services:**\n• **AI Chatbot:** 24/7 (always available!)\n• **Email Support:** Mon-Fri, 9 AM - 6 PM\n\n**Processing Times:**\n• **High Priority:** 2-5 days\n• **Medium Priority:** 5-15 days\n• **Low Priority:** 15-30 days\n\n**💡 Tip:** Submit complaints anytime! They'll be processed when departments open.";
+    }
+    
+    // ========== EMERGENCY ==========
+    if (msg.includes('emergency') || msg.includes('urgent') || msg.includes('immediate help') || msg.includes('crisis')) {
+        return "🚨 **URGENT - Emergency Information**\n\n**If this is a LIFE-THREATENING EMERGENCY, please call:**\n\n📞 **POLICE:** 100\n📞 **FIRE:** 101\n📞 **AMBULANCE:** 102\n📞 **WOMEN HELPLINE:** 1091\n📞 **CHILD HELPLINE:** 1098\n\n**For Urgent Civic Issues:**\n\n**Power Outage** ⚡\n• Report through Civic Pulse\n• Select 'High Priority'\n• Expected resolution: 2-5 days\n\n**Water Shortage** 💧\n• Report through Civic Pulse\n• Select 'Water Supply' category\n• Mark as 'urgent' in description\n\n**Medical Emergency** 🏥\n• Call 108 for ambulance\n• Nearest hospital emergency room\n\n**⚠️ Remember:** For life-threatening emergencies, ALWAYS call emergency services first. Use Civic Pulse for follow-up and tracking.\n\n**Stay Safe!** 🛡️";
+    }
+    
+    // ========== AI FEATURES ==========
+    if (msg.includes('ai features') || msg.includes('artificial intelligence') || msg.includes('how ai works') || msg.includes('ai analysis')) {
+        return "🤖 **AI Features in Civic Pulse**\n\n**What Our AI Does:**\n\n**1. Complaint Categorization** 📂\n• Automatically identifies complaint type\n• Maps to correct department\n• 9 categories recognized\n• Real-time as you type\n\n**2. Sentiment Analysis** 😊\n• Detects emotion in text\n• Classifies as Positive/Neutral/Negative\n• Identifies urgency level\n• Helps prioritize responses\n\n**3. Priority Assignment** ⚡\n• Auto-assigns High/Medium/Low priority\n• Based on urgency keywords\n• Considers sentiment intensity\n• Flags critical issues\n\n**4. Real-time Preview** 🔄\n• Updates as you type\n• Shows detected category\n• Displays priority and sentiment\n• Allows user verification\n\n**Benefits:**\n✅ Faster complaint routing\n✅ Consistent categorization\n✅ Reduced human error\n✅ 24/7 availability\n✅ Scalable processing\n\n**What If AI Makes Mistake?**\n• You can override before submission\n• Admin can reassign manually\n• Corrections help improve AI";
+    }
+    
+    // ========== VOICE FEATURES ==========
+    if (msg.includes('voice') || msg.includes('microphone') || msg.includes('speak')) {
+        return "🎤 **Voice Features - Talk to Me!**\n\n**How Voice Input Works:**\n\n1️⃣ Click the **microphone icon 🎤** in the chat box\n2️⃣ Allow microphone access when prompted\n3️⃣ Speak clearly in English\n4️⃣ Your speech converts to text automatically\n5️⃣ I'll respond to your question\n\n**Tips for Best Results:**\n• Speak at normal speed\n• Reduce background noise\n• Speak complete sentences\n• Speak clearly and distinctly\n\n**What You Can Say:**\n• 'How do I register?'\n• 'Track complaint CP-UNC60906'\n• 'Water problem how to complain?'\n\n**Privacy:**\n🔒 Voice data processed locally\n🔒 No recordings stored\n🔒 Only used for current conversation\n\n**Accessibility:** Voice input makes Civic Pulse accessible for everyone! 🌟";
+    }
+    
+    // ========== COMPLAINT ID ==========
+    if (msg.includes('complaint id') || msg.includes('where do i find my complaint id') || msg.includes('lost complaint id')) {
+        return "🆔 **Complaint ID Information**\n\n**Format:** `CP-XXXYYYYYY`\n\n**Breakdown:**\n• **CP** = Civic Pulse prefix\n• **XXX** = 3 random letters (e.g., UNC, SRD)\n• **YYYYYY** = 6-digit sequential number\n\n**Examples:**\n• `CP-UNC60906` - Water Supply complaint\n• `CP-SRD30348` - Education complaint\n\n**Where to Find It:**\n📧 **Email** - Check your inbox immediately after submission\n📋 **Dashboard** - In 'My Complaints' section\n📱 **Notification** - In status update emails\n\n**If You Lost Your ID:**\n✅ Login to your account\n✅ Go to 'My Complaints'\n✅ All your complaint IDs are listed\n✅ Click any to see full details\n\n**Pro Tip:** Save complaint IDs in your phone notes for quick access to tracking!";
+    }
+    
+    // ========== FEEDBACK ==========
+    if (msg.includes('feedback') || msg.includes('rate') || msg.includes('satisfaction')) {
+        return "⭐ **How to Provide Feedback**\n\n**When to Give Feedback:**\nAfter your complaint is marked **'Resolved'**, you'll receive an email with a feedback link.\n\n**Feedback Process:**\n\n1️⃣ **Receive Email** 📧\nSubject: 'Complaint Resolved - Share Your Feedback'\n\n2️⃣ **Click Feedback Link** 🔗\nValid for 30 days after resolution\n\n3️⃣ **Rate Your Experience** ⭐\n• 5 Stars - Excellent\n• 4 Stars - Good\n• 3 Stars - Average\n• 2 Stars - Below expectations\n• 1 Star - Poor\n\n4️⃣ **Add Comments** 💬\n• What went well?\n• What could improve?\n\n**Why Your Feedback Matters:**\n📊 Helps track department performance\n📊 Identifies areas for improvement\n📊 Your voice shapes future improvements\n\n**💡 Tip:** Honest feedback helps everyone get better service!";
+    }
+    
+    // ========== DEFAULT FALLBACK - INTERACTIVE ==========
+    else {
+        return "🤔 **I can help you with these topics:**\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n**📝 ACCOUNT & LOGIN**\n• 'How do I login?'\n• 'How to register?'\n• 'Forgot password'\n• 'Is it free?'\n\n**📋 COMPLAINTS**\n• 'How to lodge a complaint?'\n• 'What details are required?'\n• 'Can I upload images?'\n• 'Water problem how to complain?'\n• 'Electricity complaint'\n• 'Road/Pothole complaint'\n\n**🔍 TRACKING**\n• 'How to track my complaint?'\n• 'What does pending mean?'\n• 'Complaint ID'\n\n**🏛️ INFORMATION**\n• 'What departments are available?'\n• 'How does Civic Pulse work?'\n• 'What is Civic Pulse?'\n• 'Is my data secure?'\n• 'Who handles my complaint?'\n• 'Working hours'\n\n**💬 OTHER**\n• 'Contact support'\n• 'Feedback'\n• 'Emergency'\n• 'AI features'\n• 'Voice input'\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n**Just type your question naturally and I'll help you!** 💬\n\nExample: 'How do I register?' or 'Water problem'";
+    }
+
+}
+
+// Add this helper function right after getBotResponse
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+    // Auto-open chatbot after 10 seconds if user hasn't interacted
+    setTimeout(() => {
+        if (!chatbotWidget.classList.contains('active') && isFirstInteraction) {
+            chatNotification.style.display = 'flex';
+            chatbotToggle.classList.add('has-notification');
+        }
+    }, 10000);
+});
+</script>
+{% endblock %}

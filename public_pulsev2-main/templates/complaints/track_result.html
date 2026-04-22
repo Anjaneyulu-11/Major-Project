@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Status - Public Pulse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        .status-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: none;
+            margin-bottom: 30px;
+        }
+        .complaint-id-badge {
+            font-family: monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        .status-badge {
+            font-size: 1rem;
+            padding: 8px 15px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 30px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6c757d;
+            border: 2px solid white;
+        }
+        .timeline-item.active::before {
+            background: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+        }
+        .timeline-item.completed::before {
+            background: #28a745;
+        }
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5rem;
+        }
+        .ai-analysis-badge {
+            font-size: 0.85rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="status-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto text-center">
+                    <h1 class="display-4 mb-4">Complaint Status</h1>
+                    <p class="lead">Tracking details for your complaint</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                
+                {% if success and complaint %}
+                <div class="card status-card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><i class="fas fa-tasks me-2"></i>Complaint Tracking</h3>
+                        <span class="complaint-id-badge bg-light text-primary px-3 py-2 rounded">
+                            {{ complaint.readable_id }}
+                        </span>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        
+                        <!-- Status Summary -->
+                        <div class="row mb-5">
+                            <div class="col-md-12 text-center">
+                                {% if complaint.status == 'Resolved' %}
+                                <div class="status-icon bg-success text-white">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h2 class="text-success mb-3">✅ Resolved</h2>
+                                <p class="lead">Your complaint has been successfully resolved.</p>
+                                {% elif complaint.status == 'In Progress' %}
+                                <div class="status-icon bg-warning text-dark">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <h2 class="text-warning mb-3">🔄 In Progress</h2>
+                                <p class="lead">Your complaint is currently being processed.</p>
+                                {% elif complaint.status == 'Closed' %}
+                                <div class="status-icon bg-secondary text-white">
+                                    <i class="fas fa-archive"></i>
+                                </div>
+                                <h2 class="text-secondary mb-3">📦 Closed</h2>
+                                <p class="lead">Your complaint has been closed.</p>
+                                {% else %}
+                                <div class="status-icon bg-info text-white">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
+                                <h2 class="text-info mb-3">📥 Submitted</h2>
+                                <p class="lead">Your complaint has been received and is in queue.</p>
+                                {% endif %}
+                                
+                                <div class="mt-4">
+                                    <span class="status-badge badge bg-{% if complaint.status == 'Resolved' %}success{% elif complaint.status == 'In Progress' %}warning{% elif complaint.status == 'Closed' %}secondary{% else %}info{% endif %}">
+                                        {{ complaint.status }}
+                                    </span>
+                                    <span class="status-badge badge bg-dark mx-2">
+                                        <i class="fas fa-calendar me-1"></i>{{ complaint.created_at|date:"d M Y" }}
+                                    </span>
+                                    <span class="status-badge badge bg-dark">
+                                        <i class="fas fa-tag me-1"></i>{{ complaint.category }}
+                                    </span>
+                                </div>
+                                
+                                <!-- AI Analysis Badges -->
+                                {% if complaint.ai_category or complaint.ai_priority %}
+                                <div class="mt-3">
+                                    {% if complaint.ai_category %}
+                                    <span class="ai-analysis-badge badge bg-info">
+                                        <i class="fas fa-robot me-1"></i>AI Category: {{ complaint.ai_category }}
+                                    </span>
+                                    {% endif %}
+                                    {% if complaint.ai_priority %}
+                                    <span class="ai-analysis-badge badge bg-{% if complaint.ai_priority == 'High' %}danger{% elif complaint.ai_priority == 'Medium' %}warning{% elif complaint.ai_priority == 'Low' %}success{% else %}secondary{% endif %}">
+                                        <i class="fas fa-flag me-1"></i>AI Priority: {{ complaint.ai_priority }}
+                                    </span>
+                                    {% endif %}
+                                    {% if complaint.ai_sentiment %}
+                                    <span class="ai-analysis-badge badge bg-{% if complaint.ai_sentiment == 'Very Negative' or complaint.ai_sentiment == 'Negative' %}danger{% elif complaint.ai_sentiment == 'Positive' or complaint.ai_sentiment == 'Very Positive' %}success{% else %}warning{% endif %}">
+                                        <i class="fas fa-smile me-1"></i>AI Sentiment: {{ complaint.ai_sentiment }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Complaint Timeline -->
+                        <div class="row mb-5">
+                            <div class="col-md-12">
+                                <h4 class="text-primary mb-4"><i class="fas fa-history me-2"></i>Complaint Timeline</h4>
+                                <div class="timeline">
+                                    
+                                    <div class="timeline-item completed">
+                                        <h5>Complaint Submitted</h5>
+                                        <p class="text-muted mb-0">Your complaint was received on {{ complaint.created_at|date:"d M Y, h:i A" }}</p>
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="timeline-item {% if complaint.status in 'Submitted,Assigned,In Progress,Resolved,Closed' %}completed{% endif %} {% if complaint.status == 'Submitted' %}active{% endif %}">
+                                        <h5>Under Review</h5>
+                                        <p class="text-muted mb-0">Complaint is being reviewed and categorized</p>
+                                        {% if complaint.status == 'Submitted' %}
+                                        <small class="text-primary">
+                                            <i class="fas fa-clock me-1"></i>Current Step
+                                        </small>
+                                        {% elif complaint.status in 'Assigned,In Progress,Resolved,Closed' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="timeline-item {% if complaint.status in 'In Progress,Resolved,Closed' %}completed{% endif %} {% if complaint.status == 'Assigned' %}active{% endif %}">
+                                        <h5>Processing Started</h5>
+                                        <p class="text-muted mb-0">Complaint is being processed by the concerned department</p>
+                                        {% if complaint.ai_category %}
+                                        <p class="mb-1"><small><strong>AI Analysis:</strong></small></p>
+                                        <div class="mb-2">
+                                            {% if complaint.ai_category %}
+                                            <span class="badge bg-info">Category: {{ complaint.ai_category }}</span>
+                                            {% endif %}
+                                            {% if complaint.ai_priority %}
+                                            <span class="badge bg-{% if complaint.ai_priority == 'High' %}danger{% elif complaint.ai_priority == 'Medium' %}warning{% elif complaint.ai_priority == 'Low' %}success{% else %}secondary{% endif %}">
+                                                Priority: {{ complaint.ai_priority }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% if complaint.status == 'Assigned' %}
+                                        <small class="text-primary">
+                                            <i class="fas fa-clock me-1"></i>Current Step
+                                        </small>
+                                        {% elif complaint.status in 'In Progress,Resolved,Closed' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="timeline-item {% if complaint.status in 'Resolved,Closed' %}completed{% endif %} {% if complaint.status == 'In Progress' %}active{% endif %}">
+                                        <h5>Resolution in Progress</h5>
+                                        <p class="text-muted mb-0">Department is working on resolving your complaint</p>
+                                        {% if complaint.status == 'In Progress' %}
+                                        <small class="text-primary">
+                                            <i class="fas fa-clock me-1"></i>Current Step
+                                        </small>
+                                        {% elif complaint.status in 'Resolved,Closed' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="timeline-item {% if complaint.status == 'Resolved' %}completed active{% endif %} {% if complaint.status == 'Closed' %}completed{% endif %}">
+                                        <h5>Complaint Resolved</h5>
+                                        <p class="text-muted mb-0">Your complaint has been successfully resolved</p>
+                                        {% if complaint.status == 'Resolved' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Current Step
+                                        </small>
+                                        {% elif complaint.status == 'Closed' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if complaint.status == 'Closed' %}
+                                    <div class="timeline-item completed active">
+                                        <h5>Case Closed</h5>
+                                        <p class="text-muted mb-0">The complaint has been officially closed</p>
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Complaint Details -->
+                        <div class="row mb-5">
+                            <div class="col-md-12">
+                                <div class="card border">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Complaint Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <table class="table table-sm table-borderless">
+                                                    <tr>
+                                                        <th width="40%">Complaint ID:</th>
+                                                        <td><code>{{ complaint.readable_id }}</code></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Name:</th>
+                                                        <td>{{ complaint.name }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Email:</th>
+                                                        <td>{{ complaint.email }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Phone:</th>
+                                                        <td>{{ complaint.phone|default:"Not provided" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>City:</th>
+                                                        <td>{{ complaint.city }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <table class="table table-sm table-borderless">
+                                                    <tr>
+                                                        <th width="40%">Category:</th>
+                                                        <td>{{ complaint.category }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Submission Date:</th>
+                                                        <td>{{ complaint.created_at|date:"d M Y, h:i A" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Last Updated:</th>
+                                                        <td>{{ complaint.updated_at|date:"d M Y, h:i A" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Database ID:</th>
+                                                        <td><small>{{ complaint.id }}</small></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>UUID:</th>
+                                                        <td><small>{{ complaint.uuid_id }}</small></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if complaint.details %}
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6><i class="fas fa-comment-dots me-2"></i>Complaint Description:</h6>
+                                            <div class="border rounded p-3 bg-light mt-2">
+                                                {{ complaint.details|linebreaks }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if complaint.address %}
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6><i class="fas fa-map-marker-alt me-2"></i>Address:</h6>
+                                            <div class="border rounded p-3 bg-light mt-2">
+                                                {{ complaint.address|linebreaks }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if complaint.sub_category %}
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6><i class="fas fa-tags me-2"></i>Sub-category:</h6>
+                                            <div class="mt-2">
+                                                <span class="badge bg-secondary">{{ complaint.sub_category }}</span>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if complaint.resolution_details %}
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6><i class="fas fa-check-circle me-2"></i>Resolution Details:</h6>
+                                            <div class="border rounded p-3 bg-success bg-opacity-10 mt-2">
+                                                {{ complaint.resolution_details|linebreaks }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if complaint.image %}
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6><i class="fas fa-paperclip me-2"></i>Attachment:</h6>
+                                            <div class="mt-2">
+                                                <a href="{{ complaint.image.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>View Image
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-center">
+                                <div class="d-flex flex-wrap justify-content-center gap-3">
+                                    <a href="{% url 'track_complaint' %}" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Track Another Complaint
+                                    </a>
+                                    <a href="{% url 'lodge_complaint' %}" class="btn btn-success">
+                                        <i class="fas fa-plus me-2"></i>New Complaint
+                                    </a>
+                                    <button onclick="window.print()" class="btn btn-secondary">
+                                        <i class="fas fa-print me-2"></i>Print This Page
+                                    </button>
+                                    <a href="mailto:support@publicpulse.gov?subject=Update on Complaint {{ complaint.readable_id }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-envelope me-2"></i>Contact Support
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estimated Resolution -->
+                        {% if complaint.status != 'Resolved' and complaint.status != 'Closed' %}
+                        <div class="alert alert-info mt-5">
+                            <h5><i class="fas fa-clock me-2"></i>Estimated Resolution Time</h5>
+                            <p class="mb-0">
+                                Based on the category and priority, your complaint is expected to be resolved within 
+                                <strong>3-7 working days</strong>. You'll receive an email notification when the status updates.
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+                
+                {% else %}
+                <!-- Not Found Message -->
+                <div class="card status-card">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Complaint Not Found</h3>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                            <h4>No Complaint Found</h4>
+                            <p class="text-muted">We couldn't find any complaint matching your search.</p>
+                            <p class="mb-0">Search query: <strong>"{{ search_query }}"</strong></p>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap justify-content-center gap-3">
+                            <a href="{% url 'track_complaint' %}" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Try Again
+                            </a>
+                            <a href="{% url 'lodge_complaint' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Lodge New Complaint
+                            </a>
+                            <a href="/" class="btn btn-outline-secondary">
+                                <i class="fas fa-home me-2"></i>Return to Home
+                            </a>
+                        </div>
+                        
+                        <div class="mt-4 text-start">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Tips for finding your complaint:</h6>
+                            <ul class="text-muted">
+                                <li>Check your email for the complaint confirmation</li>
+                                <li>Make sure you're entering the exact Complaint ID</li>
+                                <li>Try searching by your email address or name</li>
+                                <li>Check for any typos or extra spaces</li>
+                                <li>Allow 1 hour for new complaints to appear in the system</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-scroll to top when page loads
+        window.onload = function() {
+            window.scrollTo(0, 0);
+        };
+        
+        // Print functionality
+        function printPage() {
+            window.print();
+        }
+        
+        // Copy complaint ID to clipboard
+        function copyComplaintId() {
+            const complaintId = "{{ complaint.readable_id }}";
+            navigator.clipboard.writeText(complaintId).then(function() {
+                alert("Complaint ID copied to clipboard: " + complaintId);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

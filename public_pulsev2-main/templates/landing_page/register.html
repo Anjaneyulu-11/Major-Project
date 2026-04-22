@@ -1,0 +1,830 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Civic Pulse{% endblock %}
+
+{% block styles %}
+<style>
+.register-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 60px 0;
+}
+
+.register-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.register-left {
+    background: linear-gradient(135deg, #24CFED 0%, #1db7d8 100%);
+    color: white;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.register-left h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.register-left p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.benefit-list {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+}
+
+.benefit-list li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.benefit-list i {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.register-right {
+    padding: 60px 40px;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header h3 {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.register-header p {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-with-icon input:focus {
+    border-color: #24CFED;
+    box-shadow: 0 0 0 3px rgba(36, 207, 237, 0.1);
+    outline: none;
+}
+
+.password-strength {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.strength-meter {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    margin-top: 3px;
+}
+
+.terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.terms-checkbox input {
+    margin-top: 3px;
+}
+
+.terms-checkbox label {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    line-height: 1.4;
+}
+
+.terms-checkbox a {
+    color: #24CFED;
+    text-decoration: none;
+}
+
+.terms-checkbox a:hover {
+    text-decoration: underline;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #24CFED 0%, #1db7d8 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.register-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(36, 207, 237, 0.2);
+}
+
+.register-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.divider {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+    color: #7f8c8d;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.social-register {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    color: #2c3e50;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.social-btn:hover {
+    border-color: #24CFED;
+    background: #f8f9fa;
+}
+
+.login-link {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+.login-link a {
+    color: #24CFED;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: #1db7d8;
+    text-decoration: underline;
+}
+
+.alert-message {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-container {
+        flex-direction: column;
+    }
+    
+    .register-left, .register-right {
+        width: 100%;
+        padding: 40px 20px;
+    }
+    
+    .social-register {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="register-section">
+    <div class="container">
+        <div class="register-container row g-0">
+            <!-- Left Side - Benefits -->
+            <div class="col-lg-6 register-left">
+                <div class="benefits-content">
+                    <h2>Join Civic Pulse</h2>
+                    <p>Create your account and start making a difference in your community today.</p>
+                    
+                    <ul class="benefit-list">
+                        <li>
+                            <i class="fas fa-bullhorn"></i>
+                            <span><strong>Voice Your Concerns:</strong> Report issues and provide feedback directly to government authorities</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-robot"></i>
+                            <span><strong>AI-Powered Assistance:</strong> Get instant help from our intelligent chat assistant</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-chart-line"></i>
+                            <span><strong>Real-time Tracking:</strong> Monitor the progress of your complaints in real-time</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-shield-alt"></i>
+                            <span><strong>Secure Platform:</strong> Your data is protected with industry-standard encryption</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-users"></i>
+                            <span><strong>Community Impact:</strong> Join thousands of citizens improving public services</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="testimonial mt-4 p-3 bg-white bg-opacity-10 rounded">
+                        <p class="mb-2">
+                            <i class="fas fa-quote-left me-2"></i>
+                            Public Pulse made it so easy to report the potholes in our neighborhood. Within days, the issue was resolved!
+                        </p>
+                        <p class="mb-0 text-end">
+                            <strong>- Sarah M., Community Member</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Registration Form -->
+            <div class="col-lg-6 register-right">
+                <div class="register-header">
+                    <img src="{% static 'Images/publicpulselogo.png' %}" alt="Public Pulse" height="50" class="mb-3">
+                    <h3>Create Your Account</h3>
+                    <p>Join thousands of citizens making a difference</p>
+                </div>
+                
+                <!-- Messages -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert-message alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Registration Form -->
+                <form method="POST" action="{% url 'register' %}" class="register-form" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Choose a username" 
+                                required
+                                minlength="3"
+                                maxlength="30"
+                                pattern="[A-Za-z0-9_]+"
+                                title="Only letters, numbers, and underscores allowed">
+                        </div>
+                        <small class="text-muted">3-30 characters, letters, numbers and underscores only</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder="your.email@example.com" 
+                                required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="full_name">Full Name (Optional)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-id-card"></i>
+                            <input 
+                                type="text" 
+                                id="full_name" 
+                                name="full_name" 
+                                placeholder="Enter your full name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number (Optional)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                placeholder="+254 700 000 000"
+                                pattern="[\+\d\s\-\(\)]+">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Create a strong password" 
+                                required
+                                minlength="6">
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">Password strength</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input 
+                                type="password" 
+                                id="confirm_password" 
+                                name="confirm_password" 
+                                placeholder="Re-enter your password" 
+                                required
+                                minlength="6">
+                        </div>
+                        <div id="passwordMatch" class="small mt-2"></div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            I agree to the <a href="{% url 'terms_conditions' %}" target="_blank">Terms & Conditions</a> and 
+                            <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>. I understand that my data will be used 
+                            to process complaints and improve government services.
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="register-btn" id="submitBtn">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                    
+                    <div class="divider">
+                        <span>Or sign up with</span>
+                    </div>
+                    
+                    <div class="social-register">
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-google text-danger"></i> Google
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-facebook text-primary"></i> Facebook
+                        </button>
+                    </div>
+                    
+                    <div class="login-link">
+                        <p>Already have an account? 
+                            <a href="{% url 'login' %}">Sign in here</a>
+                        </p>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Your information is secure and will never be shared with third parties
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Additional Links -->
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <div class="quick-links">
+                    <!-- FIXED LINE 294: Changed 'index' to 'home' -->
+                    <a href="{% url 'home' %}" class="text-decoration-none me-3">
+                        <i class="fas fa-home me-1"></i> Back to Home
+                    </a>
+                    <a href="{% url 'lodge_complaint' %}" class="text-decoration-none me-3">
+                        <i class="fas fa-edit me-1"></i> Lodge Complaint
+                    </a>
+                    <a href="{% url 'track_complaint' %}" class="text-decoration-none">
+                        <i class="fas fa-search me-1"></i> Track Complaint
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password strength meter
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const passwordMatch = document.getElementById('passwordMatch');
+    const submitBtn = document.getElementById('submitBtn');
+    const registerForm = document.getElementById('registerForm');
+    
+    // Check password strength
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        
+        // Length check
+        if (password.length >= 8) strength += 1;
+        if (password.length >= 12) strength += 1;
+        
+        // Character variety checks
+        if (/[a-z]/.test(password)) strength += 1; // lowercase
+        if (/[A-Z]/.test(password)) strength += 1; // uppercase
+        if (/[0-9]/.test(password)) strength += 1; // numbers
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1; // special chars
+        
+        // Calculate percentage and set colors
+        let percentage = (strength / 6) * 100;
+        let color, text;
+        
+        if (password.length === 0) {
+            color = '#e0e0e0';
+            text = 'Password strength';
+        } else if (strength <= 2) {
+            color = '#dc3545';
+            text = 'Weak';
+        } else if (strength <= 4) {
+            color = '#ffc107';
+            text = 'Medium';
+        } else {
+            color = '#28a745';
+            text = 'Strong';
+        }
+        
+        strengthFill.style.width = percentage + '%';
+        strengthFill.style.background = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
+        
+        return strength;
+    }
+    
+    // Check password match
+    function checkPasswordMatch() {
+        const p1 = passwordInput.value;
+        const p2 = confirmPasswordInput.value;
+        
+        if (p1 === '' && p2 === '') {
+            passwordMatch.textContent = '';
+            passwordMatch.style.color = '';
+            return false;
+        }
+        
+        if (p1 === p2 && p1.length >= 6) {
+            passwordMatch.innerHTML = '<i class="fas fa-check-circle me-1"></i> Passwords match';
+            passwordMatch.style.color = '#28a745';
+            return true;
+        } else if (p2.length > 0) {
+            passwordMatch.innerHTML = '<i class="fas fa-times-circle me-1"></i> Passwords do not match';
+            passwordMatch.style.color = '#dc3545';
+            return false;
+        } else {
+            passwordMatch.textContent = '';
+            return false;
+        }
+    }
+    
+    // Real-time validation
+    passwordInput.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+        checkPasswordMatch();
+        updateSubmitButton();
+    });
+    
+    confirmPasswordInput.addEventListener('input', function() {
+        checkPasswordMatch();
+        updateSubmitButton();
+    });
+    
+    // Form validation
+    registerForm.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear previous errors
+        document.querySelectorAll('.input-error').forEach(el => el.remove());
+        
+        // Validate username
+        const username = document.getElementById('username');
+        if (!username.value.trim()) {
+            showError(username, 'Please enter a username');
+            isValid = false;
+        } else if (!/^[A-Za-z0-9_]+$/.test(username.value)) {
+            showError(username, 'Only letters, numbers and underscores allowed');
+            isValid = false;
+        } else if (username.value.length < 3) {
+            showError(username, 'Username must be at least 3 characters');
+            isValid = false;
+        }
+        
+        // Validate email
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim()) {
+            showError(email, 'Please enter your email');
+            isValid = false;
+        } else if (!emailRegex.test(email.value)) {
+            showError(email, 'Please enter a valid email address');
+            isValid = false;
+        }
+        
+        // Validate password strength
+        const strength = checkPasswordStrength(passwordInput.value);
+        if (passwordInput.value.length < 6) {
+            showError(passwordInput, 'Password must be at least 6 characters');
+            isValid = false;
+        } else if (strength <= 2) {
+            showError(passwordInput, 'Please choose a stronger password');
+            isValid = false;
+        }
+        
+        // Validate password match
+        if (!checkPasswordMatch()) {
+            showError(confirmPasswordInput, 'Passwords do not match');
+            isValid = false;
+        }
+        
+        // Validate terms
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            showError(terms, 'You must agree to the terms and conditions');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Add shake animation to invalid fields
+            document.querySelectorAll('.input-error').forEach(error => {
+                const input = error.closest('.form-group').querySelector('input');
+                if (input) {
+                    input.parentElement.classList.add('shake');
+                    setTimeout(() => {
+                        input.parentElement.classList.remove('shake');
+                    }, 500);
+                }
+            });
+        } else {
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            submitBtn.disabled = true;
+            
+            // Re-enable after 10 seconds (in case of error)
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 10000);
+        }
+    });
+    
+    function showError(element, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'input-error text-danger small mt-2';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> ${message}`;
+        
+        if (element.type === 'checkbox') {
+            element.closest('.terms-checkbox').appendChild(errorDiv);
+        } else {
+            element.parentElement.parentElement.appendChild(errorDiv);
+        }
+        
+        if (element.type !== 'checkbox') {
+            element.style.borderColor = '#dc3545';
+            
+            // Auto-remove error when user starts typing
+            element.addEventListener('input', function() {
+                errorDiv.remove();
+                this.style.borderColor = '#e0e0e0';
+            }, { once: true });
+        }
+    }
+    
+    function updateSubmitButton() {
+        const strength = checkPasswordStrength(passwordInput.value);
+        const isMatch = checkPasswordMatch();
+        const hasUsername = document.getElementById('username').value.length >= 3;
+        const hasEmail = document.getElementById('email').value.includes('@');
+        
+        if (hasUsername && hasEmail && strength >= 3 && isMatch) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+    
+    // Initialize password visibility toggles
+    function initPasswordToggle(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        
+        const toggle = document.createElement('span');
+        toggle.className = 'password-toggle';
+        toggle.innerHTML = '<i class="fas fa-eye"></i>';
+        toggle.style.cssText = 'position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #7f8c8d;';
+        
+        input.parentElement.appendChild(toggle);
+        input.style.paddingRight = '45px';
+        
+        toggle.addEventListener('click', function() {
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+    }
+    
+    initPasswordToggle('password');
+    initPasswordToggle('confirm_password');
+    
+    // Add CSS for animations
+    const style = document.createElement('style');
+    style.textContent = `
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .input-error {
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Social register buttons
+    document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            alert('Social registration coming soon! For now, please use the regular registration.');
+        });
+    });
+    
+    // Auto-format phone number
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (!value.startsWith('254')) {
+                    value = '254' + value;
+                }
+                let formatted = '+254 ';
+                if (value.length > 3) {
+                    formatted += value.substr(3, 3) + ' ';
+                }
+                if (value.length > 6) {
+                    formatted += value.substr(6, 3) + ' ';
+                }
+                if (value.length > 9) {
+                    formatted += value.substr(9, 3);
+                }
+                this.value = formatted.trim();
+            }
+        });
+    }
+    
+    // Initialize submit button state
+    updateSubmitButton();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!-- templates/pulse_admin/complaints.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Complaints - Public Pulse Admin</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .complaints-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .complaints-table th, .complaints-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .complaints-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Manage Complaints</h1>
+        <a href="/pulse_admin/dashboard/">Back to Dashboard</a>
+        
+        <table class="complaints-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Submitted Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr>
+                    <td>{{ complaint.id }}</td>
+                    <td>{{ complaint.title }}</td>
+                    <td>{{ complaint.status }}</td>
+                    <td>{{ complaint.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="/pulse_admin/complaints/{{ complaint.id }}/">View</a>
+                        <a href="/pulse_admin/complaints/{{ complaint.id }}/update/">Update</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No complaints found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

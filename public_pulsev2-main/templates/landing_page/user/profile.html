@@ -1,0 +1,403 @@
+<!-- templates/landing_page/user/profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+    .profile-container {
+        background: #f5f5f5;
+        min-height: calc(100vh - 80px);
+        padding: 20px;
+    }
+
+    .profile-header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-content {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .sidebar {
+        width: 250px;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .profile-picture {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .profile-picture img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #0d6efd;
+        margin-bottom: 10px;
+    }
+
+    .profile-picture h4 {
+        margin: 0;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .sidebar a {
+        display: block;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-bottom: 5px;
+        transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+        background: #f0f7ff;
+        color: #0d6efd;
+        transform: translateX(5px);
+    }
+
+    .sidebar a.active {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .form-container {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2 {
+        color: #333;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        font-weight: 600;
+    }
+
+    .profile-form .form-group {
+        margin-bottom: 25px;
+    }
+
+    .profile-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .profile-form input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .profile-form input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.1);
+        outline: none;
+    }
+
+    .profile-form input[readonly] {
+        background-color: #f9f9f9;
+        cursor: not-allowed;
+    }
+
+    .profile-form button {
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+
+    .profile-form button:hover {
+        background: #0b5ed7;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-change-password {
+        background: #ffc107;
+        color: #212529;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-left: 10px;
+    }
+
+    .btn-change-password:hover {
+        background: #e0a800;
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-left: 10px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-back:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    /* Messages */
+    .messages {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    /* Stats Cards */
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-top: 4px solid #0d6efd;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Recent Complaints */
+    .recent-complaints {
+        margin-top: 30px;
+    }
+
+    .complaint-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .complaint-item:last-child {
+        border-bottom: none;
+    }
+
+    .complaint-title {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .complaint-id {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .complaint-status {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-resolved {
+        background: #d4edda;
+        color: #155724;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="messages">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="profile-content">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="profile-picture">
+                <img src="{% static 'Images/placeholder.jpg' %}" alt="user">
+                <h4>{{ user.username }}</h4>
+            </div>
+            <a href="{% url 'profile' %}" class="active">Profile</a>
+            <a href="{% url 'my_complaints' %}">My Complaints</a>
+            <a href="{% url 'change_password' %}">Change Password</a>
+            <a href="{% url 'logout' %}" style="color: #dc3545;">Logout</a>
+        </div>
+
+        <!-- Main Form Content -->
+        <div class="form-container">
+            <h2>Edit Profile</h2>
+            
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_complaints|default:"0" }}</div>
+                    <div class="stat-label">Total Complaints</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ resolved_count|default:"0" }}</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <form method="POST" class="profile-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" value="{{ user.username }}" readonly>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" value="{{ user.email }}" required>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="submit">Update Profile</button>
+                    <a href="{% url 'change_password' %}" class="btn-change-password">
+                        Change Password
+                    </a>
+                    <a href="{% url 'citizen_dashboard' %}" class="btn-back">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </form>
+
+            <!-- Recent Complaints -->
+            {% if user_complaints %}
+            <div class="recent-complaints">
+                <h3 style="margin-bottom: 20px;">Recent Complaints</h3>
+                <div style="background: #f9f9f9; border-radius: 8px; padding: 10px;">
+                    {% for complaint in user_complaints|slice:":5" %}
+                    <div class="complaint-item">
+                        <div>
+                            <div class="complaint-title">{{ complaint.title|default:"Untitled Complaint" }}</div>
+                            <div class="complaint-id">ID: {{ complaint.complaint_id }}</div>
+                        </div>
+                        <div>
+                            {% if complaint.status == 'Resolved' %}
+                                <span class="complaint-status status-resolved">Resolved</span>
+                            {% else %}
+                                <span class="complaint-status status-pending">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if total_complaints > 5 %}
+                    <div style="text-align: center; padding: 15px;">
+                        <a href="{% url 'my_complaints' %}" style="color: #0d6efd; text-decoration: none;">
+                            View All Complaints →
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

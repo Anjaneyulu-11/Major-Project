@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #dee2e6; }
+        .complaint-id { background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; border: 2px dashed #667eea; font-size: 24px; font-weight: bold; color: #667eea; }
+        .btn { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Public Pulse</h2>
+        <p>Your Complaint Has Been Registered</p>
+    </div>
+    
+    <div class="content">
+        <h3>Hello {{ name }},</h3>
+        <p>Thank you for submitting your complaint through Public Pulse. We have received your concern and it has been registered in our system.</p>
+        
+        <div class="complaint-id">
+            {{ complaint_id }}
+        </div>
+        
+        <p><strong>Complaint Details:</strong></p>
+        <ul>
+            <li><strong>Title:</strong> {{ complaint_title }}</li>
+            <li><strong>Category:</strong> {{ category }}</li>
+            <li><strong>Submitted:</strong> {{ created_date }}</li>
+        </ul>
+        
+        <p><strong>What Happens Next?</strong></p>
+        <ol>
+            <li>Our AI system analyzes your complaint</li>
+            <li>It gets assigned to the relevant department</li>
+            <li>You will receive updates on progress</li>
+            <li>The department works on resolution</li>
+            <li>You get notified when resolved</li>
+        </ol>
+        
+        <center>
+            <a href="{{ track_url }}" class="btn">Track Your Complaint</a>
+        </center>
+        
+        <div class="footer">
+            <p>This is an automated email. Please do not reply.</p>
+            <p>&copy; {% now "Y" %} Public Pulse. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

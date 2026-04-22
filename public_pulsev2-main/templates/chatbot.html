@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Civic Pulse Assistant{% endblock %}
+
+{% block styles %}
+<style>
+.chat-container { max-width: 900px; margin: 0 auto; }
+.chat-box { height: 60vh; overflow-y: auto; background: #fff; padding: 20px; border-radius: 8px; }
+.user-msg { text-align: right; margin-bottom: 12px; }
+.bot-msg { text-align: left; margin-bottom: 12px; }
+.msg { display: inline-block; padding: 10px 14px; border-radius: 10px; }
+.user-msg .msg { background: #0d6efd; color: white; }
+.bot-msg .msg { background: #f1f3f5; color: #222; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container chat-container mt-4">
+    <h2>Civic Pulse Assistant</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            <div class="chat-box" id="chatBox">
+                {% for c in chats %}
+                    <div class="{% if c.response and c.message %}user-msg{% endif %}">
+                        {% if c.message %}
+                        <div class="msg">{{ c.message }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="bot-msg">
+                        {% if c.response %}
+                        <div class="msg">{{ c.response }}</div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>No messages yet. Ask a question using the form below.</p>
+                {% endfor %}
+            </div>
+
+            <form method="post" class="mt-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="message" class="form-control" placeholder="Ask about lodging, tracking, profile or support" required />
+                    <button class="btn btn-primary" type="submit">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-scroll chat box
+const box = document.getElementById('chatBox');
+if (box) { box.scrollTop = box.scrollHeight; }
+</script>
+{% endblock %}

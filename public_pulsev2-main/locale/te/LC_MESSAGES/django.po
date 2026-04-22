@@ -1,0 +1,471 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the public-pulse package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: public-pulse 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-07 16:51\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: తెలుగు <EMAIL@ADDRESS>\n"
+"Language: te\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: Home page link
+msgid "Home"
+msgstr "హోమ్"
+
+#: Register button
+msgid "Register"
+msgstr "నమోదు చేయండి"
+
+#: Login button
+msgid "Login"
+msgstr "లాగిన్"
+
+#: Logout button
+msgid "Logout"
+msgstr "లాగআউట్"
+
+#: Dashboard page
+msgid "Dashboard"
+msgstr "డ్యాషబోర్డ్"
+
+#: User profile
+msgid "Profile"
+msgstr "ప్రొఫైల్"
+
+#: Settings page
+msgid "Settings"
+msgstr "సెట్టింగ్‌లు"
+
+#: Help section
+msgid "Help"
+msgstr "సహాయం"
+
+#: About us
+msgid "About"
+msgstr "గురించి"
+
+#: Contact us
+msgid "Contact"
+msgstr "సంప్రదించండి"
+
+#: Submit button
+msgid "Submit"
+msgstr "సమర్పించండి"
+
+#: Cancel button
+msgid "Cancel"
+msgstr "రద్దు చేయండి"
+
+#: Save button
+msgid "Save"
+msgstr "సేవ్ చేయండి"
+
+#: Delete button
+msgid "Delete"
+msgstr "తొలగించండి"
+
+#: Edit button
+msgid "Edit"
+msgstr "సవరించండి"
+
+#: Back button
+msgid "Back"
+msgstr "వెనుకకు"
+
+#: Next button
+msgid "Next"
+msgstr "తర్వాత"
+
+#: Previous button
+msgid "Previous"
+msgstr "మునుపటి"
+
+#: Loading indicator
+msgid "Loading"
+msgstr "లోడ్ చేస్తున్నాం"
+
+#: Error message
+msgid "Error"
+msgstr "ఎర్రర్"
+
+#: Success message
+msgid "Success"
+msgstr "విజయం"
+
+#: Warning message
+msgid "Warning"
+msgstr "హెచ్చరిక"
+
+#: Confirm action
+msgid "Confirm"
+msgstr ""
+
+#: Yes option
+msgid "Yes"
+msgstr ""
+
+#: No option
+msgid "No"
+msgstr ""
+
+#: Search placeholder
+msgid "Search"
+msgstr "శోధించండి"
+
+#: Filter button
+msgid "Filter"
+msgstr "ఫిల్టర్"
+
+#: Sort option
+msgid "Sort"
+msgstr ""
+
+#: View button
+msgid "View"
+msgstr "వీక్షించండి"
+
+#: Download button
+msgid "Download"
+msgstr "డౌన్‌లోడ్"
+
+#: Upload button
+msgid "Upload"
+msgstr "అపలోడ్"
+
+#: File label
+msgid "File"
+msgstr ""
+
+#: Name field
+msgid "Name"
+msgstr "పేరు"
+
+#: Email field
+msgid "Email"
+msgstr "ఇమెయిల్"
+
+#: Password field
+msgid "Password"
+msgstr "పాస్‌వర్డ్"
+
+#: Phone field
+msgid "Phone"
+msgstr "ఫోన్"
+
+#: Address field
+msgid "Address"
+msgstr ""
+
+#: City field
+msgid "City"
+msgstr ""
+
+#: State field
+msgid "State"
+msgstr ""
+
+#: Country field
+msgid "Country"
+msgstr ""
+
+#: Zip code field
+msgid "Zip"
+msgstr ""
+
+#: Required field indicator
+msgid "Required"
+msgstr ""
+
+#: Optional field indicator
+msgid "Optional"
+msgstr ""
+
+msgid "- Sarah M., Community Member"
+msgstr ""
+msgid "1. Register Account"
+msgstr ""
+msgid "2. Lodge Complaint"
+msgstr ""
+msgid "3-30 characters, letters, numbers and underscores only"
+msgstr ""
+msgid "3. AI Analysis"
+msgstr ""
+msgid "4. Track Progress"
+msgstr ""
+msgid "5. Resolution & Feedback"
+msgstr ""
+msgid "A simple and reliable way to share concerns that matter to everyday life."
+msgstr ""
+msgid "AI Categorization"
+msgstr ""
+msgid "AI detects urgency level for faster resolution of critical issues and emergency situations."
+msgstr ""
+msgid "AI-Powered Assistance:"
+msgstr ""
+msgid "AI-Powered Features"
+msgstr ""
+msgid "AI-powered complaint categorization"
+msgstr ""
+msgid "Ab"
+msgstr ""
+msgid "Accessibility Controls (Alt+A)"
+msgstr ""
+msgid "Accessibility panel"
+msgstr ""
+msgid "Admin"
+msgstr ""
+msgid "Admin Dashboard"
+msgstr ""
+msgid "Administrator"
+msgstr ""
+msgid "Advanced technology for better governance and citizen engagement"
+msgstr ""
+msgid "Automatic categorization using advanced AI algorithms for accurate routing of complaints to relevant departments."
+msgstr ""
+msgid "Back to Home"
+msgstr ""
+msgid "Change Password (Coming Soon)"
+msgstr ""
+msgid "Choose a username"
+msgstr ""
+msgid "Citizen"
+msgstr ""
+msgid "Civic Pulse"
+msgstr ""
+msgid "Civic Pulse AI"
+msgstr ""
+msgid "Community Impact:"
+msgstr ""
+msgid "Complaint History"
+msgstr ""
+msgid "Complaints"
+msgstr ""
+msgid "Complaints Resolved"
+msgstr ""
+msgid "Comprehensive analytics and visualization of complaint trends and resolution patterns."
+msgstr ""
+msgid "Confirm Password"
+msgstr ""
+msgid "Connecting citizens and governance through intelligent digital solutions."
+msgstr ""
+msgid "Create Account"
+msgstr ""
+msgid "Create Free Account"
+msgstr ""
+msgid "Create Your Account"
+msgstr ""
+msgid "Create a strong password"
+msgstr ""
+msgid "Create your account in minutes. Just provide basic details and verify your email to get started."
+msgstr ""
+msgid "Data Analytics"
+msgstr ""
+msgid "Department"
+msgstr ""
+msgid "Detailed Guide"
+msgstr ""
+msgid "Email Address"
+msgstr ""
+msgid "Empowering students and citizens to report educational infrastructure and service issues."
+msgstr ""
+msgid "End-to-end encryption and secure data handling to protect your privacy and information."
+msgstr ""
+msgid "Ensuring reliable power by enabling quick reporting of electrical issues."
+msgstr ""
+msgid "Enter your full name"
+msgstr ""
+msgid "Enter your password"
+msgstr ""
+msgid "Enter your username or email"
+msgstr ""
+msgid "Facebook"
+msgstr ""
+msgid "Forgot Password?"
+msgstr ""
+msgid "Full Name (Optional)"
+msgstr ""
+msgid "Get Started"
+msgstr ""
+msgid "Get instant help from our intelligent chat assistant"
+msgstr ""
+msgid "Get notified when your complaint is resolved. Provide feedback to help us improve our services."
+msgstr ""
+msgid "Giving citizens a voice to improve access and quality of public healthcare services."
+msgstr ""
+msgid "Go to Dashboard"
+msgstr ""
+msgid "Google"
+msgstr ""
+msgid "Government"
+msgstr ""
+msgid "Government Official"
+msgstr ""
+msgid "Happy Citizens"
+msgstr ""
+msgid "Hear from our satisfied users"
+msgstr ""
+msgid "Hello! I"
+msgstr ""
+msgid "Helping communities report and resolve local civic challenges efficiently."
+msgstr ""
+msgid "Hi there! 👋 Welcome to Civic Pulse. How can I assist you today?"
+msgstr ""
+msgid "How It Works"
+msgstr ""
+msgid "How do I register?"
+msgstr ""
+msgid "How does Civic Pulse work?"
+msgstr ""
+msgid "How it Works"
+msgstr ""
+msgid "Is my data secure?"
+msgstr ""
+msgid "Join Civic Pulse"
+msgstr ""
+msgid "Join thousands of citizens improving public services"
+msgstr ""
+msgid "Join thousands of citizens making a difference"
+msgstr ""
+msgid "Just now"
+msgstr ""
+msgid "Language selector"
+msgstr ""
+msgid "Learn More"
+msgstr ""
+msgid "Lodge Complaint"
+msgstr ""
+msgid "Lodge a Complaint"
+msgstr ""
+msgid "Login - Civic Pulse"
+msgstr ""
+msgid "Making public transportation safer and more efficient through citizen feedback."
+msgstr ""
+msgid "Manage system & view analytics"
+msgstr ""
+msgid "Monitor the progress of your complaints in real-time"
+msgstr ""
+msgid "My Complaints"
+msgstr ""
+msgid "Nakuru Resident"
+msgstr ""
+msgid "No credit card required. Start in seconds."
+msgstr ""
+msgid "Only letters, numbers, and underscores allowed"
+msgstr ""
+msgid "Or continue with"
+msgstr ""
+msgid "Or sign up with"
+msgstr ""
+msgid "Our AI system automatically categorizes your complaint, detects priority level, and analyzes sentiment for better handling."
+msgstr ""
+msgid "Password strength"
+msgstr ""
+msgid "Phone Number (Optional)"
+msgstr ""
+msgid "Priority Detection"
+msgstr ""
+msgid "Priority detection for urgent issues"
+msgstr ""
+msgid "Proceed to department portal →"
+msgstr ""
+msgid "Promoting transparency by enabling secure and responsible reporting of corruption."
+msgstr ""
+msgid "Public"
+msgstr ""
+msgid "Re-enter your password"
+msgstr ""
+msgid "Ready to Make Your Voice Heard?"
+msgstr ""
+msgid "Ready to help you"
+msgstr ""
+msgid "Real-time Tracking"
+msgstr ""
+msgid "Real-time Tracking:"
+msgstr ""
+msgid "Register - Civic Pulse"
+msgstr ""
+msgid "Register Now"
+msgstr ""
+msgid "Remember me"
+msgstr ""
+msgid "Review & resolve complaints"
+msgstr ""
+msgid "Satisfaction Rate"
+msgstr ""
+msgid "Secure Platform"
+msgstr ""
+msgid "Secure Platform:"
+msgstr ""
+msgid "Secure and confidential platform"
+msgstr ""
+msgid "See How It Works"
+msgstr ""
+msgid "Select Language (Alt+L)"
+msgstr ""
+msgid "Select Your Role:"
+msgstr ""
+msgid "Select your role and enter credentials"
+msgstr ""
+msgid "Sentiment Analysis"
+msgstr ""
+msgid "Sign In"
+msgstr ""
+msgid "Sign In to Civic Pulse"
+msgstr ""
+msgid "Simple 5-step process to get your issues resolved"
+msgstr ""
+msgid "Small Business Owner"
+msgstr ""
+msgid "Strengthening public safety by allowing citizens to report concerns in real time."
+msgstr ""
+msgid "Submit complaints & track status"
+msgstr ""
+msgid "Submit your complaint through our user-friendly form. Provide details about the issue, location, and any relevant information."
+msgstr ""
+msgid "Support"
+msgstr ""
+msgid "Support Available"
+msgstr ""
+msgid "Supporting timely action on water-related concerns for healthier communities."
+msgstr ""
+msgid "System Admin"
+msgstr ""
+msgid "Track Complaint"
+msgstr ""
+msgid "Track your complaint status in real-time with detailed progress updates and notifications."
+msgstr ""
+msgid "Track your complaint status in real-time. Receive updates at every stage of the resolution process via email and dashboard."
+msgstr ""
+msgid "Transforming public feedback into actionable insights using AI."
+msgstr ""
+msgid "Understand citizen emotions and satisfaction levels for better service delivery and response."
+msgstr ""
+msgid "Username"
+msgstr ""
+msgid "Username or Email"
+msgstr ""
+msgid "Voice Your Concerns:"
+msgstr ""
+msgid "Welcome Back!"
+msgstr ""
+msgid "What Citizens Say"
+msgstr ""
+msgid "What can I complain about?"
+msgstr ""
+msgid "Your data is protected with 256-bit SSL encryption"
+msgstr ""
+msgid "Your data is protected with industry-standard encryption"
+msgstr ""
+msgid "Your information is secure and will never be shared with third parties"
+msgstr ""
+msgid "out Civic Pulse"
+msgstr ""

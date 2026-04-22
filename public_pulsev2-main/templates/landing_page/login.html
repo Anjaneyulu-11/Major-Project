@@ -1,0 +1,678 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Civic Pulse{% endblock %}
+
+{% block styles %}
+<style>
+.login-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 60px 0;
+}
+
+.login-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.login-left {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-left h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.login-left p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+}
+
+.feature-list li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.feature-list i {
+    color: #24CFED;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.login-right {
+    padding: 60px 40px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-header h3 {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+/* User Type Selection */
+.user-type-selection {
+    margin-bottom: 30px;
+}
+
+.user-type-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.user-type-btn {
+    flex: 1;
+    padding: 20px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    color: #2c3e50;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.user-type-btn:hover {
+    border-color: #24CFED;
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.user-type-btn.active {
+    border-color: #24CFED;
+    background: #e8f7fa;
+    color: #1db7d8;
+}
+
+.user-type-btn i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #7f8c8d;
+}
+
+.user-type-btn.active i {
+    color: #24CFED;
+}
+
+.user-type-btn .badge {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+}
+
+/* Department Selection */
+.department-selection {
+    display: none;
+    margin-top: 20px;
+}
+
+.department-selection.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.department-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.department-card {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.department-card:hover {
+    border-color: #24CFED;
+    background: #e8f7fa;
+    transform: translateY(-2px);
+}
+
+.department-card.active {
+    border-color: #24CFED;
+    background: #e8f7fa;
+}
+
+.department-card i {
+    font-size: 1.5rem;
+    color: #24CFED;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.department-card .department-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.department-card .department-desc {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-with-icon input:focus {
+    border-color: #24CFED;
+    box-shadow: 0 0 0 3px rgba(36, 207, 237, 0.1);
+    outline: none;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.forgot-password {
+    color: #24CFED;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #1db7d8;
+    text-decoration: underline;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #24CFED 0%, #1db7d8 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(36, 207, 237, 0.2);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.divider {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+    color: #7f8c8d;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.register-link {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+.register-link a {
+    color: #24CFED;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-link a:hover {
+    color: #1db7d8;
+    text-decoration: underline;
+}
+
+.alert-message {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .department-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+    
+    .login-left, .login-right {
+        width: 100%;
+        padding: 40px 20px;
+    }
+    
+    .user-type-buttons {
+        flex-direction: column;
+    }
+    
+    .user-type-btn {
+        min-height: 100px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="container">
+        <div class="login-container row g-0">
+            <!-- Left Side - Welcome & Features -->
+            <div class="col-lg-6 login-left">
+                <div class="welcome-content">
+                    <h2>Welcome Back!</h2>
+                    <p>Sign in to your Civic Pulse account to continue making your voice heard.</p>
+                    
+                    <ul class="feature-list">
+                        <li>
+                            <i class="fas fa-user-circle"></i>
+                            <span><strong>Citizen:</strong> Submit complaints & track status</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-user-shield"></i>
+                            <span><strong>Admin:</strong> Manage system & view analytics</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-building"></i>
+                            <span><strong>Department:</strong> Review & resolve complaints</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-robot"></i>
+                            <span>AI-powered complaint categorization</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-bolt"></i>
+                            <span>Priority detection for urgent issues</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure and confidential platform</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="stats mt-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h4 class="text-warning">1500+</h4>
+                                <small>Complaints Resolved</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-success">94%</h4>
+                                <small>Satisfaction Rate</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-info">24/7</h4>
+                                <small>Support</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Login Form -->
+            <div class="col-lg-6 login-right">
+                <div class="login-header">
+                    <img src="{% static 'Images/publicpulselogo.png' %}" alt="Civic Pulse" height="50" class="mb-3">
+                    <h3>Sign In to Civic Pulse</h3>
+                    <p>Select your role and enter credentials</p>
+                </div>
+                
+                <!-- Messages -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert-message alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- User Type Selection -->
+                <div class="user-type-selection">
+                    <h5 class="mb-3">Select Your Role:</h5>
+                    <div class="user-type-buttons">
+                        <button type="button" class="user-type-btn active" data-user-type="citizen">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Citizen</span>
+                            <span class="badge bg-primary">Public</span>
+                        </button>
+                        <button type="button" class="user-type-btn" data-user-type="admin">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Administrator</span>
+                            <span class="badge bg-warning">System Admin</span>
+                        </button>
+                        <button type="button" class="user-type-btn" data-user-type="department">
+                            <i class="fas fa-building"></i>
+                            <span>Department</span>
+                            <span class="badge bg-success">Government</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Department Selection (Hidden by default) -->
+                    <div class="department-selection" id="departmentSelection" style="display: none;">
+                        <p style="color: #7f8c8d; text-align: center; margin: 20px 0;">Proceed to department portal →</p>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <form method="POST" action="{% url 'login' %}" class="login-form" id="loginForm">
+                    {% csrf_token %}
+                    
+                    <input type="hidden" name="user_type" id="userType" value="citizen">
+                    
+                    <div class="form-group">
+                        <label for="username">Username or Email</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Enter your username or email" 
+                                required
+                                autocomplete="username"
+                                autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Enter your password" 
+                                required
+                                minlength="6"
+                                autocomplete="current-password">
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">
+                            <i class="fas fa-key me-1"></i> Forgot Password?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    
+                    <div class="divider">
+                        <span>Or continue with</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-google text-danger"></i> Google
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-facebook text-primary"></i> Facebook
+                        </button>
+                    </div>
+                    
+                    <div class="register-link">
+                        <p>Don't have an account? 
+                            <a href="{% url 'register' %}">Create an account</a>
+                        </p>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Your data is protected with 256-bit SSL encryption
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Additional Links -->
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <div class="quick-links">
+                    <a href="{% url 'home' %}" class="text-decoration-none me-3">
+                        <i class="fas fa-home me-1"></i> Back to Home
+                    </a>
+                    <a href="{% url 'lodge_complaint' %}" class="text-decoration-none me-3">
+                        <i class="fas fa-edit me-1"></i> Lodge Complaint
+                    </a>
+                    <a href="{% url 'track_complaint' %}" class="text-decoration-none">
+                        <i class="fas fa-search me-1"></i> Track Complaint
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeBtns = document.querySelectorAll('.user-type-btn');
+    const userTypeInput = document.getElementById('userType');
+    const departmentSelection = document.getElementById('departmentSelection');
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    
+    userTypeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userType = this.dataset.userType;
+            userTypeBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            userTypeInput.value = userType;
+            
+            if (userType === 'department') {
+                departmentSelection.style.display = 'block';
+            } else {
+                departmentSelection.style.display = 'none';
+            }
+        });
+    });
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            document.querySelectorAll('.input-error').forEach(el => el.remove());
+            
+            if (!usernameInput.value.trim()) {
+                showError(usernameInput, 'Please enter username');
+                isValid = false;
+            }
+            
+            if (!passwordInput.value.trim()) {
+                showError(passwordInput, 'Please enter password');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    function showError(input, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'input-error text-danger small mt-2';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> ${message}`;
+        if (input.parentElement.parentElement) {
+            input.parentElement.parentElement.appendChild(errorDiv);
+        }
+    }
+    
+    const togglePassword = document.createElement('span');
+    togglePassword.className = 'password-toggle';
+    togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+    togglePassword.style.cssText = 'position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #7f8c8d;';
+    
+    if (passwordInput.parentElement) {
+        passwordInput.parentElement.appendChild(togglePassword);
+        passwordInput.style.paddingRight = '45px';
+    }
+    
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+    
+    document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Social login coming soon!');
+        });
+    });
+});
+</script>
+{% endblock %}

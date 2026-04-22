@@ -1,0 +1,753 @@
+<!-- templates/complaints/track_complaint.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Complaint - Public Pulse{% endblock %}
+
+{% block styles %}
+<style>
+.track-section {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+}
+.status-badge {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-top: 20px;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #0d6efd;
+}
+.timeline-content {
+    padding-bottom: 15px;
+    border-left: 2px solid #dee2e6;
+    padding-left: 20px;
+}
+.complaint-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    border: none;
+    transition: transform 0.3s ease;
+}
+.complaint-card:hover {
+    transform: translateY(-5px);
+}
+.search-box {
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+.ai-badge {
+    font-size: 0.8em;
+    padding: 3px 8px;
+    margin-left: 5px;
+}
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.keyword-badge {
+    margin: 2px;
+    font-size: 0.85em;
+}
+.complaint-id {
+    font-family: monospace;
+    font-weight: bold;
+    color: #0d6efd;
+}
+.info-box {
+    border-left: 4px solid #0d6efd;
+    padding-left: 15px;
+    margin: 15px 0;
+}
+.stats-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+.tracking-animation {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+.status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+/* Fix for progress bar logic */
+.progress-bar-submitted { background-color: #0d6efd !important; }
+.progress-bar-inprogress { background-color: #ffc107 !important; }
+.progress-bar-resolved { background-color: #198754 !important; }
+.progress-bar-pending { background-color: #6c757d !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="track-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h1 class="display-4 mb-4">Track Complaint Status</h1>
+                <p class="lead">Enter your Complaint ID to track the status and updates of your complaint in real-time.</p>
+                {% if not complaint %}
+                <div class="mt-4">
+                    <div class="d-inline-flex align-items-center bg-white bg-opacity-25 rounded-pill px-4 py-2">
+                        <i class="fas fa-search me-2"></i>
+                        <span>Need help finding your Complaint ID? <a href="#help-section" class="text-white fw-bold">Click here</a></span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Display Messages -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2"></i>
+            {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {% else %}
+            <i class="fas fa-info-circle me-2"></i>
+            {% endif %}
+        </strong>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Search Box -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card complaint-card">
+                <div class="card-body p-4">
+                    <form method="POST" class="search-box" action="{% url 'track_complaint' %}">
+                        {% csrf_token %}
+                        <div class="input-group input-group-lg shadow-sm">
+                            <span class="input-group-text bg-primary text-white">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="complaint_id" 
+                                   class="form-control form-control-lg tracking-animation" 
+                                   placeholder="Enter Complaint ID (e.g., CP-20251230-ABC123)"
+                                   value="{{ complaint_id|default:'' }}"
+                                   required
+                                   autocomplete="off"
+                                   id="complaintIdInput">
+                            <button class="btn btn-primary btn-lg" type="submit" id="trackBtn">
+                                <i class="fas fa-search me-2"></i> Track Status
+                            </button>
+                        </div>
+                        <div class="form-text mt-3 text-center">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Your Complaint ID was sent to your email after submission
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Complaint Details -->
+    {% if complaint %}
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <!-- Success Message -->
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h4 class="alert-heading mb-1">Complaint Found!</h4>
+                        <p class="mb-0">
+                            Complaint ID: <span class="complaint-id fw-bold">{{ complaint.complaint_id }}</span>
+                            <button onclick="copyComplaintId()" 
+                                    class="btn btn-sm btn-outline-dark ms-2">
+                                <i class="fas fa-copy me-1"></i> Copy ID
+                            </button>
+                        </p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+            
+            <!-- Complaint Status Overview -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card complaint-card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Complaint Status Overview</h5>
+                            <div class="d-flex align-items-center">
+                                <small class="me-3">Last Updated: {{ complaint.updated_at|date:"d M Y, h:i A"|default:"-" }}</small>
+                                {% now "Y-m-d" as current_date %}
+                                {% with days_since=complaint.created_at|timesince %}
+                                <span class="badge bg-light text-dark">{{ days_since|cut:" day"|cut:" days"|truncatechars:10 }} ago</span>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <!-- Status Progress -->
+                                <div class="col-md-8">
+                                    <div class="row text-center">
+                                        <div class="col">
+                                            <div class="status-icon bg-primary text-white">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </div>
+                                            <small class="d-block mt-2">Submitted</small>
+                                            <div class="mt-1">{{ complaint.created_at|date:"d M"|default:"-" }}</div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="progress flex-grow-1 mx-2" style="height: 6px; margin-top: 17px;">
+                                                    <div class="progress-bar progress-bar-submitted" 
+                                                         style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="status-icon {% if complaint.status == 'In Progress' or complaint.status == 'Resolved' %}bg-warning text-dark{% else %}bg-secondary text-white{% endif %}">
+                                                <i class="fas fa-cog"></i>
+                                            </div>
+                                            <small class="d-block mt-2">In Progress</small>
+                                            {% if complaint.updated_at and complaint.status != 'Submitted' %}
+                                            <div class="mt-1">{{ complaint.updated_at|date:"d M" }}</div>
+                                            {% else %}
+                                            <div class="mt-1">-</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="progress flex-grow-1 mx-2" style="height: 6px; margin-top: 17px;">
+                                                    <div class="progress-bar {% if complaint.status == 'In Progress' or complaint.status == 'Resolved' %}progress-bar-inprogress{% else %}bg-secondary{% endif %}" 
+                                                         style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="status-icon {% if complaint.status == 'Resolved' %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            <small class="d-block mt-2">Resolved</small>
+                                            {% if complaint.status == 'Resolved' %}
+                                            <div class="mt-1">{{ complaint.updated_at|date:"d M" }}</div>
+                                            {% else %}
+                                            <div class="mt-1">-</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Status Badge -->
+                                <div class="col-md-4 text-center">
+                                    <div class="stats-box">
+                                        <small class="text-muted d-block">Current Status</small>
+                                        {% if complaint.status == 'Resolved' %}
+                                        <span class="status-badge bg-success text-white fs-5 mt-2">
+                                            <i class="fas fa-check-circle me-2"></i>{{ complaint.status }}
+                                        </span>
+                                        {% elif complaint.status == 'In Progress' %}
+                                        <span class="status-badge bg-warning text-dark fs-5 mt-2">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>{{ complaint.status }}
+                                        </span>
+                                        {% elif complaint.status == 'Pending' %}
+                                        <span class="status-badge bg-secondary text-white fs-5 mt-2">
+                                            <i class="fas fa-clock me-2"></i>{{ complaint.status }}
+                                        </span>
+                                        {% elif complaint.status == 'Rejected' %}
+                                        <span class="status-badge bg-danger text-white fs-5 mt-2">
+                                            <i class="fas fa-times-circle me-2"></i>{{ complaint.status }}
+                                        </span>
+                                        {% else %}
+                                        <span class="status-badge bg-primary text-white fs-5 mt-2">{{ complaint.status|default:"Submitted" }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Complaint Details -->
+            <div class="row">
+                <!-- Left Column - Complaint Information -->
+                <div class="col-md-5">
+                    <div class="card complaint-card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Complaint Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box mb-3">
+                                <h6 class="text-primary mb-1">Personal Details</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <th width="40%">Name:</th>
+                                            <td>{{ complaint.name|default:"N/A" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email:</th>
+                                            <td>{{ complaint.email|default:"N/A" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phone:</th>
+                                            <td>{{ complaint.phone|default:"Not provided" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Location:</th>
+                                            <td>
+                                                {{ complaint.city|default:"N/A" }}
+                                                {% if complaint.pincode %}
+                                                ({{ complaint.pincode }})
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="info-box mb-3">
+                                <h6 class="text-primary mb-1">Complaint Details</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <th width="40%">Category:</th>
+                                            <td>
+                                                {{ complaint.category|default:"General" }}
+                                                {% if complaint.ai_category and complaint.ai_category != complaint.category %}
+                                                <span class="badge bg-info ai-badge" title="AI Detected Category">
+                                                    AI: {{ complaint.ai_category }}
+                                                </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sub-Category:</th>
+                                            <td>{{ complaint.sub_category|default:"Not specified" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Priority:</th>
+                                            <td>
+                                                {% if complaint.ai_priority == 'High' %}
+                                                <span class="badge bg-danger">{{ complaint.ai_priority }}</span>
+                                                {% elif complaint.ai_priority == 'Medium' %}
+                                                <span class="badge bg-warning text-dark">{{ complaint.ai_priority }}</span>
+                                                {% elif complaint.ai_priority == 'Low' %}
+                                                <span class="badge bg-success">{{ complaint.ai_priority }}</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Not set</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Submitted:</th>
+                                            <td>{{ complaint.created_at|date:"d M Y, h:i A"|default:"-" }}</td>
+                                        </tr>
+                                        {% if complaint.status == 'Resolved' %}
+                                        <tr>
+                                            <th>Resolved:</th>
+                                            <td>{{ complaint.updated_at|date:"d M Y, h:i A" }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Complaint Description -->
+                            <div class="info-box">
+                                <h6 class="text-primary mb-2"><i class="fas fa-file-alt me-2"></i>Complaint Description</h6>
+                                <div class="border rounded p-3 bg-light">
+                                    {{ complaint.details|linebreaks|default:"No description provided" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Middle Column - Status Updates -->
+                <div class="col-md-4">
+                    <div class="card complaint-card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Status Timeline</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <!-- Submitted -->
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Complaint Submitted</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    {{ complaint.name }}
+                                                </small>
+                                            </div>
+                                            <small class="text-muted">{{ complaint.created_at|timesince }} ago</small>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ complaint.created_at|date:"d M Y, h:i A" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Status -->
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Status: {{ complaint.status }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-cog me-1"></i>
+                                                    System
+                                                </small>
+                                            </div>
+                                            <small class="text-muted">{{ complaint.updated_at|timesince }} ago</small>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Last updated: {{ complaint.updated_at|date:"d M Y, h:i A" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Estimated Resolution -->
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Estimated Resolution</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    3-7 working days
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                Based on category: {{ complaint.category }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - AI Analysis & Actions -->
+                <div class="col-md-3">
+                    <!-- AI Analysis Card -->
+                    <div class="card complaint-card mb-3">
+                        <div class="card-header bg-purple text-white">
+                            <h6 class="mb-0"><i class="fas fa-robot me-2"></i>AI Analysis</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center">
+                                <!-- Sentiment -->
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Sentiment</small>
+                                    {% if complaint.ai_sentiment == 'Negative' or complaint.ai_sentiment == 'Very Negative' %}
+                                    <span class="badge bg-danger">{{ complaint.ai_sentiment|default:"Neutral" }}</span>
+                                    {% elif complaint.ai_sentiment == 'Positive' or complaint.ai_sentiment == 'Very Positive' %}
+                                    <span class="badge bg-success">{{ complaint.ai_sentiment|default:"Neutral" }}</span>
+                                    {% else %}
+                                    <span class="badge bg-info">{{ complaint.ai_sentiment|default:"Neutral" }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Confidence -->
+                                {% if complaint.ai_confidence %}
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">AI Confidence</small>
+                                    <div class="fw-bold text-primary">{{ complaint.ai_confidence }}</div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Simple Keywords Display -->
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Detected Topics</small>
+                                    {% if complaint.category %}
+                                    <span class="badge bg-light text-dark border keyword-badge mb-1">{{ complaint.category }}</span>
+                                    {% endif %}
+                                    {% if complaint.ai_category and complaint.ai_category != complaint.category %}
+                                    <span class="badge bg-light text-dark border keyword-badge mb-1">AI: {{ complaint.ai_category }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions Card -->
+                    <div class="card complaint-card">
+                        <div class="card-header bg-dark text-white">
+                            <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button onclick="printComplaint()" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-print me-2"></i> Print Details
+                                </button>
+                                
+                                {% if complaint.status != 'Resolved' %}
+                                <a href="{% url 'lodge_complaint' %}" 
+                                   class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-plus me-2"></i> New Complaint
+                                </a>
+                                {% endif %}
+                                
+                                <button onclick="shareComplaint()" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-share-alt me-2"></i> Share Status
+                                </button>
+                                
+                                <a href="{% url 'track_complaint' %}" class="btn btn-outline-dark btn-sm">
+                                    <i class="fas fa-search me-2"></i> Track Another
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% elif request.method == 'POST' and not complaint %}
+    <!-- Not Found Message -->
+    <div class="row justify-content-center" id="help-section">
+        <div class="col-md-8">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h4 class="alert-heading mb-2">Complaint Not Found!</h4>
+                        <p class="mb-2">The Complaint ID <strong>"{{ complaint_id }}"</strong> was not found in our system.</p>
+                        <hr>
+                        <div class="mb-0">
+                            <h6><i class="fas fa-lightbulb me-1"></i>Possible reasons:</h6>
+                            <ul class="mb-0">
+                                <li>The Complaint ID may be incorrect</li>
+                                <li>Check for typos or extra spaces</li>
+                                <li>The complaint might have been submitted recently (allow 1 hour for processing)</li>
+                                <li>Contact support if you've lost your Complaint ID</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card complaint-card">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help Finding ID?</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> Check your email inbox</li>
+                                <li class="mb-2"><i class="fas fa-sms text-success me-2"></i> Look in SMS messages</li>
+                                <li class="mb-2"><i class="fas fa-print text-secondary me-2"></i> Check printed receipts if any</li>
+                                <li><i class="fas fa-spam text-danger me-2"></i> Check spam/junk folder in email</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card complaint-card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-headset me-2"></i>Contact Support</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><i class="fas fa-envelope me-2"></i> Email: <a href="mailto:support@publicpulse.gov">support@publicpulse.gov</a></p>
+                            <p><i class="fas fa-phone me-2"></i> Phone: 1800-123-4567 (Toll-free)</p>
+                            <p><i class="fas fa-clock me-2"></i> Hours: 9 AM - 6 PM (Mon-Sat)</p>
+                            <a href="{% url 'lodge_complaint' %}" class="btn btn-primary btn-sm w-100 mt-2">
+                                <i class="fas fa-plus me-1"></i> Lodge New Complaint
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Copy complaint ID to clipboard - FIXED VERSION
+function copyComplaintId() {
+    const complaintId = "{{ complaint.complaint_id }}";
+    
+    navigator.clipboard.writeText(complaintId).then(function() {
+        // Show success toast
+        showToast('Complaint ID copied to clipboard!', 'success');
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        showToast('Failed to copy. Please try again.', 'error');
+    });
+}
+
+// Print complaint details
+function printComplaint() {
+    const printContent = document.querySelector('.container').innerHTML;
+    const originalContent = document.body.innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    window.location.reload();
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    // Add to document
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.getElementById(toastId);
+    
+    // Initialize and show Bootstrap toast
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+        toast.show();
+        
+        // Remove from DOM after hiding
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            this.remove();
+        });
+    } else {
+        // Fallback if Bootstrap not loaded
+        toastElement.style.display = 'block';
+        setTimeout(() => {
+            toastElement.style.display = 'none';
+            toastElement.remove();
+        }, 3000);
+    }
+}
+
+// Share complaint status
+function shareComplaint() {
+    const shareData = {
+        title: 'Complaint Status - Public Pulse',
+        text: 'Check the status of my complaint {{ complaint.complaint_id }} on Public Pulse',
+        url: window.location.href,
+    };
+    
+    if (navigator.share) {
+        navigator.share(shareData)
+            .then(() => console.log('Shared successfully'))
+            .catch(err => {
+                console.error('Share failed:', err);
+                copyToClipboard(window.location.href);
+                showToast('Link copied to clipboard!', 'success');
+            });
+    } else {
+        // Fallback: copy URL to clipboard
+        navigator.clipboard.writeText(window.location.href)
+            .then(() => showToast('Link copied to clipboard! Share it with others.', 'info'))
+            .catch(err => {
+                console.error('Copy failed:', err);
+                showToast('Please copy the URL manually from address bar', 'warning');
+            });
+    }
+}
+
+// Auto-focus and format complaint ID input
+document.addEventListener('DOMContentLoaded', function() {
+    const complaintInput = document.getElementById('complaintIdInput');
+    
+    if (complaintInput) {
+        // Auto-focus
+        if (!complaintInput.value) {
+            complaintInput.focus();
+        }
+        
+        // Auto-uppercase and remove spaces
+        complaintInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/\s+/g, '');
+            
+            // Show/hide tracking animation
+            if (this.value.length >= 5) {
+                this.classList.add('tracking-animation');
+            } else {
+                this.classList.remove('tracking-animation');
+            }
+        });
+    }
+    
+    // Auto-refresh page every 60 seconds if tracking a complaint
+    {% if complaint %}
+    setTimeout(function() {
+        showToast('Refreshing for latest updates...', 'info');
+        setTimeout(() => location.reload(), 1000);
+    }, 60000); // 60 seconds
+    {% endif %}
+});
+</script>
+{% endblock %}

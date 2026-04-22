@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Notifications - Civic Pulse{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3">
+                    <i class="fas fa-bell me-2"></i>My Notifications
+                </h2>
+                {% if unread_count > 0 %}
+                <span class="badge bg-danger">{{ unread_count }} Unread</span>
+                {% endif %}
+            </div>
+
+            <!-- Mark All as Read Button -->
+            {% if unread_count > 0 %}
+            <div class="mb-3">
+                <form method="POST" action="{% url 'complaints:mark_all_notifications_read' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-check-double me-1"></i>Mark All as Read
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Notifications List -->
+            {% if notifications %}
+                <div class="list-group">
+                {% for notification in notifications %}
+                    <div class="list-group-item {% if not notification.is_read %}list-group-item-light border-left-3 border-primary{% endif %}" style="{% if not notification.is_read %}border-left: 4px solid #4e73df;{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">
+                                    <i class="fas {% if notification.is_read %}fa-envelope-open{% else %}fa-envelope{% endif %} me-2 text-muted"></i>
+                                    {{ notification.complaint.display_id }}
+                                    {% if not notification.is_read %}
+                                    <span class="badge bg-primary">New</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-2 text-gray-700">{{ notification.message }}</p>
+                                <small class="text-muted">
+                                    <i class="far fa-calendar me-1"></i>{{ notification.created_at|date:"M d, Y H:i" }}
+                                </small>
+                            </div>
+                            <div class="ms-3">
+                                {% if not notification.is_read %}
+                                <form method="POST" action="{% url 'complaints:mark_notification_read' notification.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'complaints:notifications_list' %}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Mark as read">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <a href="{% url 'complaints:track_complaint' %}?id={{ notification.complaint.display_id }}" class="btn btn-sm btn-outline-primary ms-2" title="View complaint">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">
+                                    <i class="fas fa-chevron-left"></i> First
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                    Last <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-inbox fa-3x mb-3 text-primary"></i>
+                    <p class="mb-0">You have no notifications yet.</p>
+                    <small class="text-muted">Notifications will appear here when your complaint status changes.</small>
+                </div>
+            {% endif %}
+
+            <!-- Back to Dashboard -->
+            <div class="mt-5 text-center">
+                <a href="{% url 'landing_page:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-3 {
+        border-left-width: 4px !important;
+    }
+    .list-group-item {
+        border: 1px solid #dee2e6;
+        margin-bottom: 0.75rem;
+        border-radius: 0.375rem;
+    }
+    .list-group-item-light {
+        background-color: #f8f9fa;
+    }
+    .text-gray-700 {
+        color: #495057;
+    }
+</style>
+{% endblock %}

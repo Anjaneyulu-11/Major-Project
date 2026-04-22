@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Test</title>
+</head>
+<body>
+    <h1>Email System Test</h1>
+    {% if success %}
+        <p style="color: green; font-weight: bold;">{{ message }}</p>
+    {% else %}
+        <p style="color: red; font-weight: bold;">{{ message }}</p>
+    {% endif %}
+    <p><a href="/complaints/lodge/">Go to Complaint Form</a></p>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department Portal{% endblock %}
+
+{% block content %}
+<section class="portal-section">
+	<div class="container">
+		<div class="portal-header">
+			<h1>
+				<i class="fas fa-building me-3"></i>
+				Department Portal
+			</h1>
+			<p>Select your department to manage complaints</p>
+		</div>
+
+		<div class="departments-grid">
+			{% for dept in departments %}
+				{% if dept.slug %}
+				<a href="{% url 'department_login' dept.slug %}" class="department-card">
+					<i class="fas fa-{{ dept.icon|default:'building' }}"></i>
+					<div class="dept-name">{{ dept.name }}</div>
+					<i class="fas fa-arrow-right dept-arrow"></i>
+				</a>
+				{% else %}
+				<div class="department-card">
+					<i class="fas fa-{{ dept.icon|default:'building' }}"></i>
+					<div class="dept-name">{{ dept.name }}</div>
+				</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+</section>
+{% endblock %}

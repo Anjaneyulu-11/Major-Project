@@ -1,0 +1,384 @@
+{% extends 'pulse_admin/base.html' %}
+
+{% block title %}Admin Dashboard - Civic Pulse{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <div class="d-flex">
+            <span class="badge bg-primary me-2">
+                <i class="fas fa-calendar me-1"></i> {{ today|date:"F d, Y" }}
+            </span>
+            <a href="{% url 'pulse_admin:manage_complaints' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-list me-1"></i> Manage All Complaints
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row">
+        <!-- Total Complaints Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-card-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Complaints</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_complaints }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Complaints Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-card-warning h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Complaints</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_complaints }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolved Today Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-card-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Resolved Today</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ resolved_today }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Satisfaction Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-card-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                User Satisfaction</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ user_satisfaction }}/5</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Status Distribution Pie Chart -->
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Complaint Status Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution Bar Chart -->
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top Complaint Categories</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="categoryBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- High Priority Complaints -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow border-left-danger">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        <i class="fas fa-exclamation-triangle me-1"></i> High Priority Complaints
+                        <span class="badge bg-danger ms-2">{{ critical_complaints|length }}</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Complaint ID</th>
+                                    <th>Title/Category</th>
+                                    <th>Citizen</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Submitted</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in critical_complaints %}
+                                <tr>
+                                    <td class="fw-bold">{{ complaint.display_id }}</td>
+                                    <td>{{ complaint.category|truncatechars:30 }}</td>
+                                    <td>{{ complaint.name|truncatechars:20 }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ complaint.category|truncatechars:15 }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if complaint.ai_priority == 'High' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ complaint.ai_priority|default:"Medium" }}
+                                        </span>
+                                    </td>
+                                    <td>{{ complaint.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'pulse_admin:complaint_detail' complaint.complaint_id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                                        <p class="mb-0">No high priority complaints at the moment!</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Complaints -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Complaints</h6>
+                    <a href="{% url 'pulse_admin:manage_complaints' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Citizen</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Submitted</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in recent_complaints %}
+                                <tr>
+                                    <td class="fw-bold">{{ complaint.display_id }}</td>
+                                    <td>{{ complaint.name|truncatechars:20 }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ complaint.category|truncatechars:20 }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if complaint.status == 'Submitted' %}bg-secondary
+                                            {% elif complaint.status == 'In Progress' %}bg-info
+                                            {% elif complaint.status == 'Resolved' %}bg-success
+                                            {% elif complaint.status == 'Closed' %}bg-dark
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ complaint.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if complaint.ai_priority == 'High' %}bg-danger
+                                            {% elif complaint.ai_priority == 'Medium' %}bg-primary
+                                            {% else %}bg-success{% endif %}">
+                                            {{ complaint.ai_priority|default:"Medium" }}
+                                        </span>
+                                    </td>
+                                    <td>{{ complaint.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'pulse_admin:complaint_detail' complaint.complaint_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-3"></i>
+                                        <p class="mb-0">No complaints found. Citizens haven't submitted any complaints yet.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Status Distribution Pie Chart
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('statusPieChart').getContext('2d');
+    
+    // Parse the status data from Django template
+    var statusData = {{ status_data|safe }};
+    
+    // Define colors for each status
+    var colors = {
+        'Submitted': '#4e73df',    // Blue
+        'In Progress': '#36b9cc',  // Teal
+        'Resolved': '#1cc88a',     // Green
+        'Closed': '#858796',       // Gray
+        'Pending': '#f6c23e',      // Yellow (if exists)
+        'Escalated': '#e74a3b',    // Red (if exists)
+        'Rejected': '#6c757d'      // Dark gray (if exists)
+    };
+    
+    // Prepare data for chart
+    var labels = Object.keys(statusData);
+    var dataValues = Object.values(statusData);
+    var backgroundColors = labels.map(label => colors[label] || '#999999');
+    
+    var statusPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: backgroundColors,
+                hoverBackgroundColor: backgroundColors.map(color => color + 'DD'),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            var percentage = Math.round((value / total) * 100);
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Category Bar Chart
+    var categoryCtx = document.getElementById('categoryBarChart').getContext('2d');
+    
+    // Get category data from template
+    var categoryData = [
+        {% for stat in category_stats %}
+        {category: '{{ stat.category|default:"Uncategorized"|escapejs }}', count: {{ stat.count }}},
+        {% endfor %}
+    ];
+    
+    // If no data, show placeholder
+    if (categoryData.length === 0) {
+        categoryData = [
+            {category: 'No Data', count: 1}
+        ];
+    }
+    
+    var categories = categoryData.map(item => item.category);
+    var counts = categoryData.map(item => item.count);
+    
+    var categoryBarChart = new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+            labels: categories,
+            datasets: [{
+                label: 'Number of Complaints',
+                data: counts,
+                backgroundColor: '#4e73df',
+                hoverBackgroundColor: '#2e59d9',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    },
+                    ticks: {
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
